@@ -1,0 +1,98 @@
+name: Flutter CI
+
+on:
+  push:
+    branches: 
+      - main
+      - QA
+      - development
+    
+  pull_request:
+    branches: 
+      - main
+      - QA
+      - development
+
+  workflow_dispatch:  # Allows manual triggering of the workflow
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.22.2' # Using Flutter version 3.22.2
+
+    - name: Install dependencies
+      run: flutter pub get
+
+    - name: Run tests
+      run: flutter test
+
+    - name: Build APK
+      run: flutter build apk --release
+
+    - name: Archive APK
+      uses: actions/upload-artifact@v3
+      with:
+        name: TechieAi-android
+        path: build/app/outputs/flutter-apk/app-release.apk
+
+  build-windows:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.22.2' # Using Flutter version 3.22.2
+
+    - name: Install dependencies
+      run: flutter pub get
+
+    - name: Run tests
+      run: flutter test
+
+    - name: Build Windows app
+      run: flutter build windows --release
+
+    - name: Archive Windows app
+      uses: actions/upload-artifact@v3
+      with:
+        name: TechieAi-windows
+        path: build/windows/x64/Release/techie_ai.exe # Adjusted for x64 architecture
+
+  build-web:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.22.2' # Using Flutter version 3.22.2
+
+    - name: Install dependencies
+      run: flutter pub get
+
+    - name: Run tests
+      run: flutter test
+
+    - name: Build web app
+      run: flutter build web --release
+
+    - name: Archive web app
+      uses: actions/upload-artifact@v3
+      with:
+        name: TechieAi-web
+        path: build/web/
