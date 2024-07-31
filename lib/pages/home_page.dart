@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/welcome_text.dart';
 import '../widgets/header.dart';
+import 'options_screen.dart';
 
 class HomePage extends StatelessWidget {
   @override
@@ -18,7 +19,12 @@ class HomePage extends StatelessWidget {
                   SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
-                      // Add your onPressed code here!
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => OptionsScreen(),
+                        ),
+                      );
                     },
                     child: Text('Get Started'),
                   ),
