@@ -3,32 +3,27 @@ import 'package:provider/provider.dart';
 import 'package:techie_ai/service/response_provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'pages/home_page.dart';
-import 'package:techie_ai/pages/options_screen.dart';
 
 Future<void> main() async {
   await dotenv.load(fileName: ".env");
-  void main() {
-    runApp(
-      MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (_) => ResponseProvider()),
-          // Add other providers here if necessary
-        ],
-        child: MyApp(),
-      ),
-    );
-  }
+
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ResponseProvider(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Techie AI',
+      title: 'TechieAi',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: OptionsScreen(),
+      home: HomePage(),
     );
   }
 }

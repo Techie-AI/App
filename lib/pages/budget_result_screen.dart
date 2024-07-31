@@ -1,40 +1,27 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart' show rootBundle;
 
 class BudgetResultScreen extends StatefulWidget {
   final String budget;
+  final Map<String, dynamic> data;
 
-  BudgetResultScreen({required this.budget});
+  const BudgetResultScreen(
+      {super.key, required this.budget, required this.data});
 
   @override
+  // ignore: library_private_types_in_public_api
   _BudgetResultScreenState createState() => _BudgetResultScreenState();
 }
 
 class _BudgetResultScreenState extends State<BudgetResultScreen> {
   late double currentBudget;
-  String? selectedCpu;
-  String? selectedRam;
-  String? selectedOther;
   Map<String, dynamic> componentData = {};
+  Map<String, String?> selectedComponents = {};
 
   @override
   void initState() {
     super.initState();
     currentBudget = double.tryParse(widget.budget) ?? 0.0;
-    _loadComponentData();
-  }
-
-  Future<void> _loadComponentData() async {
-    try {
-      final String response = await rootBundle.loadString('JSON/flash.json');
-      final data = json.decode(response);
-      setState(() {
-        componentData = data['components'];
-      });
-    } catch (e) {
-      print("Error loading JSON data: $e");
-    }
+    componentData = widget.data['components'] ?? {};
   }
 
   void updateBudget(double price) {
@@ -76,44 +63,26 @@ class _BudgetResultScreenState extends State<BudgetResultScreen> {
             ),
             const SizedBox(height: 20),
             if (componentData.isNotEmpty) ...[
-              buildOptionCard(
-                context,
-                'CPU',
-                componentData['cpu'],
-                (String? value) {
-                  setState(() {
-                    selectedCpu = value;
-                    double price = double.parse(value!.split(' - ₹')[1].replaceAll(',', ''));
-                    updateBudget(price);
-                  });
-                },
-              ),
-              const SizedBox(height: 20),
-              buildOptionCard(
-                context,
-                'RAM',
-                componentData['ram'],
-                (String? value) {
-                  setState(() {
-                    selectedRam = value;
-                    double price = double.parse(value!.split(' - ₹')[1].replaceAll(',', ''));
-                    updateBudget(price);
-                  });
-                },
-              ),
-              const SizedBox(height: 20),
-              buildOptionCard(
-                context,
-                'Other Specs',
-                componentData['gpu'], // Replace with the appropriate component key
-                (String? value) {
-                  setState(() {
-                    selectedOther = value;
-                    double price = double.parse(value!.split(' - ₹')[1].replaceAll(',', ''));
-                    updateBudget(price);
-                  });
-                },
-              ),
+              ...componentData.keys.map((componentType) {
+                return Column(
+                  children: [
+                    buildOptionCard(
+                      context,
+                      componentType.toUpperCase(),
+                      componentData[componentType],
+                      (String? value) {
+                        setState(() {
+                          selectedComponents[componentType] = value;
+                          double price = double.parse(
+                              value!.split(' - ₹')[1].replaceAll(',', ''));
+                          updateBudget(price);
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                );
+              }),
             ] else ...[
               const Center(child: CircularProgressIndicator()),
             ],
@@ -123,8 +92,8 @@ class _BudgetResultScreenState extends State<BudgetResultScreen> {
     );
   }
 
-  Widget buildOptionCard(
-      BuildContext context, String title, List<dynamic> options, ValueChanged<String?> onChanged) {
+  Widget buildOptionCard(BuildContext context, String title,
+      List<dynamic> options, ValueChanged<String?> onChanged) {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
@@ -142,7 +111,7 @@ class _BudgetResultScreenState extends State<BudgetResultScreen> {
             const SizedBox(height: 10),
             DropdownButton<String?>(
               isExpanded: true,
-              value: options.map((e) => e['name']).contains(selectedCpu) ? selectedCpu : null,
+              value: selectedComponents[title.toLowerCase()],
               hint: const Text('Select an option'),
               onChanged: onChanged,
               items: options.map<DropdownMenuItem<String>>((dynamic option) {

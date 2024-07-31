@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -20,24 +21,34 @@ class ResponseProvider extends ChangeNotifier {
     _model = GenerativeModel(
       model: 'gemini-1.5-flash',
       apiKey: apiKey,
+      generationConfig: GenerationConfig(
+        temperature: 1,
+        topK: 64,
+        topP: 0.95,
+        maxOutputTokens: 8192,
+        responseMimeType: 'application/json',
+      ),
     );
   }
 
-  Future<void> sendPcTypeRequest(String pcType) async {
-    if (pcType.isEmpty) return;
+  Future<Map<String, dynamic>> sendPcTypeRequest(
+      String pcType, String budget) async {
+    if (pcType.isEmpty || budget.isEmpty) return {};
 
     final content = [
       Content.text(
-          'I want to build a $pcType PC. Provide me recommendations and details.')
+          'Hey, I want your advice on PC building. I want a $pcType but I have a budget of $budget INR. Can you give me multiple options for every component with prices and links to buy from, in JSON format? Give 3 options for each. JSON Example: {"components": {"cpu": {}, "motherboard": {}, ...}}')
     ];
 
     try {
       final response = await _model.generateContent(content);
 
-      print('Response: ${response.text}');
-      // Handle the JSON response as needed
+      String? output = response.text;
+
+      return jsonDecode(output!);
     } catch (e) {
       print("Error: $e");
+      return {};
     }
   }
 }

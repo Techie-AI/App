@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:techie_ai/service/chat_service.dart';
-import 'budget_result_screen.dart';
+import 'package:techie_ai/pages/budget_result_screen.dart';
+import 'package:techie_ai/service/response_provider.dart';
 
 class OptionsScreen extends StatefulWidget {
+  const OptionsScreen({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _OptionsScreenState createState() => _OptionsScreenState();
 }
 
@@ -60,7 +63,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
                     const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () {
-                        _submitSelection(context, selectedPcType);
+                        _submitSelection();
                       },
                       child: const Text('Submit'),
                     ),
@@ -76,7 +79,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
                   color: Colors.white,
                   border: Border.all(color: Colors.grey),
                   borderRadius: BorderRadius.circular(10),
-                  boxShadow: [
+                  boxShadow: const [
                     BoxShadow(
                       color: Colors.black26,
                       blurRadius: 10,
@@ -89,22 +92,23 @@ class _OptionsScreenState extends State<OptionsScreen> {
                   children: [
                     const Text(
                       'Enter your budget:',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 10),
                     TextField(
                       controller: budgetController,
                       keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
+                      decoration: const InputDecoration(
                         border: OutlineInputBorder(),
                         labelText: 'Budget',
-                        hintText: 'Enter your budget in USD',
+                        hintText: 'Enter your budget in INR',
                       ),
                     ),
                     const SizedBox(height: 20),
                     ElevatedButton(
                       onPressed: () {
-                        _submitBudget(context, budgetController.text);
+                        _submitBudget();
                       },
                       child: const Text('Submit Budget'),
                     ),
@@ -117,23 +121,25 @@ class _OptionsScreenState extends State<OptionsScreen> {
     );
   }
 
-  void _submitSelection(BuildContext context, String pcType) {
-    final chatProvider = Provider.of<ChatProvider>(context, listen: false);
-    chatProvider.setPcType(pcType);
-
+  void _submitSelection() {
     setState(() {
       showBudgetBox = true;
     });
   }
 
-  void _submitBudget(BuildContext context, String budget) {
-    final chatProvider = Provider.of<ChatProvider>(context, listen: false);
-    chatProvider.setBudget(budget);
+  void _submitBudget() async {
+    final responseProvider =
+        Provider.of<ResponseProvider>(context, listen: false);
+    final budget = budgetController.text;
+
+    // Fetch the data from the model
+    final data =
+        await responseProvider.sendPcTypeRequest(selectedPcType, budget);
 
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => BudgetResultScreen(budget: budget),
+        builder: (context) => BudgetResultScreen(budget: budget, data: data),
       ),
     );
   }
