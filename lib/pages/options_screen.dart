@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:techie_ai/service/chat_service.dart';
-// Assuming this is the correct path
+import '../service/response_provider.dart'; // Ensure this path is correct
 
 class OptionsScreen extends StatefulWidget {
+  const OptionsScreen({super.key});
+
   @override
   _OptionsScreenState createState() => _OptionsScreenState();
 }
@@ -48,7 +49,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                _submitSelection(context, selectedPcType);
+                _sendRequest(context, selectedPcType);
               },
               child: const Text('Submit'),
             ),
@@ -58,10 +59,14 @@ class _OptionsScreenState extends State<OptionsScreen> {
     );
   }
 
-  void _submitSelection(BuildContext context, String pcType) {
-    final chatProvider = Provider.of<ChatProvider>(context, listen: false);
-    chatProvider.setPcType(pcType);
+  void _sendRequest(BuildContext context, String pcType) async {
+    final responseProviderConst =
+        Provider.of<ResponseProvider>(context, listen: false);
 
-    // Navigate to another screen or provide feedback
+    // Send the PC type request
+    await responseProviderConst.sendPcTypeRequest(pcType);
+
+    // Optionally, handle UI updates or navigate to another screen
+    // For example, show a loading indicator or navigate to a result screen
   }
 }
