@@ -27,13 +27,12 @@ dev_dependencies:
 flutter:
 
   uses-material-design: true
-  
+
   # fonts:
   #   - family: Schyler
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
-assets:
-    - assets/images/logo.png
+  assets:
     - .env
