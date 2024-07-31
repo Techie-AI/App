@@ -2,16 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
-class ChatProvider with ChangeNotifier {
-  String _pcType = '';
-  String _budget = '';
+class ResponseProvider extends ChangeNotifier {
+  late GenerativeModel _model;
 
-  String get pcType => _pcType;
-  String get budget => _budget;
-
-  void setPcType(String pcType) {
-    _pcType = pcType;
-    notifyListeners();
+  ResponseProvider() {
+    _initialize();
   }
 
   Future<void> _initialize() async {
@@ -44,8 +39,5 @@ class ChatProvider with ChangeNotifier {
     } catch (e) {
       print("Error: $e");
     }
-  void setBudget(String budget) {
-    _budget = budget;
-    notifyListeners();
   }
 }
