@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:techie_ai/service/chat_service.dart';
-// Assuming ChatProvider is in service/chat_provider.dart
+// Assuming this is the correct path
 
 class OptionsScreen extends StatefulWidget {
   @override
@@ -59,11 +59,9 @@ class _OptionsScreenState extends State<OptionsScreen> {
   }
 
   void _submitSelection(BuildContext context, String pcType) {
-    // Access the ChatProvider and set the PC type
     final chatProvider = Provider.of<ChatProvider>(context, listen: false);
     chatProvider.setPcType(pcType);
 
-    // Optionally, navigate to another screen or perform additional actions
-    // For example, you might want to open a chat screen or show a confirmation message
+    // Navigate to another screen or provide feedback
   }
 }
