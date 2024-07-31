@@ -1,4 +1,4 @@
-# flutter_application_1
+# techie_ai
 
 A new Flutter project.
 
