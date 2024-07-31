@@ -7,18 +7,18 @@ class Header extends StatelessWidget {
       padding: const EdgeInsets.all(16.0),
       color: Colors.blue,
       width: double.infinity,
-      child: Row(
+      child: const Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // Image.asset(
           //   'assets/images/logo.png',
           //   height: 80,
           // ),
-          const SizedBox(width: 10),
+          SizedBox(width: 10),
           Text(
             'TecheAi',
             style: TextStyle(
-              fontSize: 28,
+              fontSize: 30,
               color: Colors.white,
             ),
           ),
