@@ -4,11 +4,9 @@ class BudgetResultScreen extends StatefulWidget {
   final String budget;
   final Map<String, dynamic> data;
 
-  const BudgetResultScreen(
-      {super.key, required this.budget, required this.data});
+  BudgetResultScreen({required this.budget, required this.data});
 
   @override
-  // ignore: library_private_types_in_public_api
   _BudgetResultScreenState createState() => _BudgetResultScreenState();
 }
 
@@ -44,9 +42,11 @@ class _BudgetResultScreenState extends State<BudgetResultScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Based on your budget, here are some recommendations:',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                const Expanded(
+                  child: Text(
+                    'Based on your budget, here are some recommendations:',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  ),
                 ),
                 Container(
                   padding: const EdgeInsets.all(8.0),
@@ -62,30 +62,37 @@ class _BudgetResultScreenState extends State<BudgetResultScreen> {
               ],
             ),
             const SizedBox(height: 20),
-            if (componentData.isNotEmpty) ...[
-              ...componentData.keys.map((componentType) {
-                return Column(
-                  children: [
-                    buildOptionCard(
-                      context,
-                      componentType.toUpperCase(),
-                      componentData[componentType],
-                      (String? value) {
-                        setState(() {
-                          selectedComponents[componentType] = value;
-                          double price = double.parse(
-                              value!.split(' - ₹')[1].replaceAll(',', ''));
-                          updateBudget(price);
-                        });
+            Expanded(
+              child: componentData.isNotEmpty
+                  ? GridView.builder(
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        childAspectRatio: 3.5, // Adjust as needed
+                        mainAxisSpacing: 10,
+                        crossAxisSpacing: 10,
+                      ),
+                      itemCount: componentData.keys.length,
+                      itemBuilder: (context, index) {
+                        String componentType =
+                            componentData.keys.elementAt(index);
+                        return buildOptionCard(
+                          context,
+                          componentType.toUpperCase(),
+                          componentData[componentType],
+                          (String? value) {
+                            setState(() {
+                              selectedComponents[componentType] = value;
+                              double price = double.parse(
+                                  value!.split(' - ₹')[1].replaceAll(',', ''));
+                              updateBudget(price);
+                            });
+                          },
+                        );
                       },
-                    ),
-                    const SizedBox(height: 20),
-                  ],
-                );
-              }),
-            ] else ...[
-              const Center(child: CircularProgressIndicator()),
-            ],
+                    )
+                  : const Center(child: CircularProgressIndicator()),
+            ),
           ],
         ),
       ),
