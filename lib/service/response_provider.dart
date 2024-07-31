@@ -17,20 +17,14 @@ class ResponseProvider extends ChangeNotifier {
       throw Exception('API_KEY is empty');
     }
 
-    print('Initializing model with API key: $apiKey');
-
     _model = GenerativeModel(
       model: 'gemini-1.5-flash',
       apiKey: apiKey,
     );
-
-    print('Model initialized successfully');
   }
 
   Future<void> sendPcTypeRequest(String pcType) async {
     if (pcType.isEmpty) return;
-
-    print('Sending request for PC type: $pcType');
 
     final content = [
       Content.text(
@@ -40,12 +34,8 @@ class ResponseProvider extends ChangeNotifier {
     try {
       final response = await _model.generateContent(content);
 
-      if (response != null) {
-        print('Response: ${response.text}');
-        // Handle the JSON response as needed
-      } else {
-        print("Error: No response from API");
-      }
+      print('Response: ${response.text}');
+      // Handle the JSON response as needed
     } catch (e) {
       print("Error: $e");
     }
