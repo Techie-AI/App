@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
-//import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class ResponseProvider extends ChangeNotifier {
   late GenerativeModel _model;
@@ -10,10 +10,10 @@ class ResponseProvider extends ChangeNotifier {
   }
 
   Future<void> _initialize() async {
-    //final apiKey = dotenv.env['API_KEY'];
-    const apiKey = "AIzaSyAi56lRfOVKIcA5Lb6hfbq11O6LfqLyCyE";
+    final apiKey = dotenv.env['API_KEY'];
+    //const apiKey = "AIzaSyAi56lRfOVKIcA5Lb6hfbq11O6LfqLyCyE";
 
-    if (apiKey.isEmpty) {
+    if (apiKey!.isEmpty) {
       throw Exception('API_KEY is empty');
     }
 
