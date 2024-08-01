@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:techie_ai/pages/budget_result_screen.dart';
+import 'package:techie_ai/pages/component_option_screen.dart';
 import 'package:techie_ai/service/response_provider.dart';
 
 class OptionsScreen extends StatefulWidget {
@@ -137,9 +137,10 @@ class _OptionsScreenState extends State<OptionsScreen> {
         await responseProvider.sendPcTypeRequest(selectedPcType, budget);
 
     Navigator.push(
+      // ignore: use_build_context_synchronously
       context,
       MaterialPageRoute(
-        builder: (context) => BudgetResultScreen(budget: budget, data: data),
+        builder: (context) => ComponentOption(budget: budget, data: data),
       ),
     );
   }
