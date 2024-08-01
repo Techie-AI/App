@@ -18,14 +18,14 @@ class HomePage extends StatelessWidget {
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Color(0xFF2c0537),
-                  Color(0xFF004081),
-                  Color(0xFF007bb6),
-                  Color(0xFF00b5c2),
-                  Color(0xFF12eba9),
+                  Color(0xFFafafaf),
+                  Color(0xFFc2c2c2),
+                  Color(0xFFd6d6d6),
+                  Color(0xFFeaeaea),
+                  Color(0xFFFFFFFF),
                 ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
+                begin: Alignment.bottomCenter,
+                end: Alignment.topCenter,
               ),
             ),
           ),
@@ -33,31 +33,37 @@ class HomePage extends StatelessWidget {
           Column(
             children: <Widget>[
               Header(),
-              Expanded(
+              const Expanded(
                 child: Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       AnimatedWelcomeText(),
-                      const SizedBox(height: 20),
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => OptionsScreen(),
-                            ),
-                          );
-                        },
-                        child: const Text('Get Started'),
-                      ),
-                      const SizedBox(height: 200),
                     ],
                   ),
                 ),
               ),
               const Footer(),
             ],
+          ),
+          // Positioned button
+          Positioned(
+            bottom: 350, // Distance from the bottom of the screen
+            left: 0,
+            right: 0,
+            child: Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const OptionsScreen(),
+                    ),
+                  );
+                },
+                child: const Text('Get Started'),
+              ),
+            ),
           ),
         ],
       ),

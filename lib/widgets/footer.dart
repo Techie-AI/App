@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
 class Footer extends StatelessWidget {
   const Footer({super.key});
 
@@ -20,24 +18,6 @@ class Footer extends StatelessWidget {
             ),
           ),
           SizedBox(height: 10),
-          Text(
-            'Follow us on:',
-            style: TextStyle(
-              fontSize: 16,
-              color: Colors.black54,
-            ),
-          ),
-          SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(FontAwesomeIcons.facebook, color: Colors.blue),
-              SizedBox(width: 10),
-              Icon(FontAwesomeIcons.twitter, color: Colors.blue),
-              SizedBox(width: 10),
-              Icon(FontAwesomeIcons.instagram, color: Colors.pink),
-            ],
-          ),
         ],
       ),
     );

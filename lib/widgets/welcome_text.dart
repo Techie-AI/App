@@ -1,43 +1,73 @@
 import 'package:flutter/material.dart';
 import 'package:animated_text_kit/animated_text_kit.dart';
 
-class AnimatedWelcomeText extends StatelessWidget {
+class AnimatedWelcomeText extends StatefulWidget {
+  const AnimatedWelcomeText({super.key});
+
+  @override
+  _AnimatedWelcomeTextState createState() => _AnimatedWelcomeTextState();
+}
+
+class _AnimatedWelcomeTextState extends State<AnimatedWelcomeText>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat(reverse: true); // Repeats animation in reverse as well
+
+    _animation = Tween<double>(begin: 100.0, end: 500.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return AnimatedTextKit(
-      animatedTexts: [
-        TypewriterAnimatedText(
-          'Welcome to your Home Page!',
-          textStyle: const TextStyle(
-            fontSize: 36,
-            fontWeight: FontWeight.bold,
-            color: Color.fromARGB(101, 197, 153, 10),
+    return Center(
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          AnimatedBuilder(
+            animation: _animation,
+            builder: (context, child) {
+              return Container(
+                width: _animation.value,
+                height: _animation.value,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.blueAccent
+                      .withOpacity(0.5), // Semi-transparent blue color
+                ),
+              );
+            },
           ),
-          speed: const Duration(milliseconds: 150),
-        ),
-        TypewriterAnimatedText(
-          'We are excited to have you here!',
-          textStyle: const TextStyle(
-            fontSize: 32,
-            fontWeight: FontWeight.w600,
-            color: Color.fromARGB(255, 255, 0, 21),
+          AnimatedTextKit(
+            animatedTexts: [
+              TypewriterAnimatedText(
+                'Welcome to TechieAi!',
+                textStyle: const TextStyle(
+                  fontSize: 100,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black, // White text color for contrast
+                ),
+                speed: const Duration(milliseconds: 200),
+              ),
+            ],
+            repeatForever: true,
           ),
-          speed: const Duration(milliseconds: 150),
-        ),
-        TypewriterAnimatedText(
-          'Explore and enjoy the features!',
-          textStyle: const TextStyle(
-            fontSize: 28,
-            fontWeight: FontWeight.normal,
-            color: Color.fromARGB(255, 65, 122, 136),
-          ),
-          speed: const Duration(milliseconds: 150),
-        ),
-      ],
-      totalRepeatCount: 1,
-      onFinished: () {
-        // Optional: Add actions when the animation finishes
-      },
+        ],
+      ),
     );
   }
 }
