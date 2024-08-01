@@ -12,7 +12,6 @@ class ResponseProvider extends ChangeNotifier {
 
   Future<void> _initialize() async {
     final apiKey = dotenv.env['API_KEY'];
-    //const apiKey = "AIzaSyAi56lRfOVKIcA5Lb6hfbq11O6LfqLyCyE";
 
     if (apiKey!.isEmpty) {
       throw Exception('API_KEY is empty');
@@ -45,7 +44,20 @@ class ResponseProvider extends ChangeNotifier {
 
       String? output = response.text;
 
-      return jsonDecode(output!);
+      if (output == null || output.isEmpty) {
+        print("No response from API");
+        return {};
+      }
+
+      final Map<String, dynamic> result = jsonDecode(output);
+
+      // Check the structure of the result and ensure it matches the expected format
+      if (result.containsKey('components') && result['components'] is Map) {
+        return result;
+      } else {
+        print("Unexpected JSON structure");
+        return {};
+      }
     } catch (e) {
       print("Error: $e");
       return {};

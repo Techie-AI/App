@@ -1,9 +1,11 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 import 'dart:typed_data';
+import 'package:url_launcher/url_launcher.dart'; // Import for handling links
 
 class ResultPage extends StatelessWidget {
   final Map<String, Map<String, String?>> selectedComponents;
@@ -18,7 +20,7 @@ class ResultPage extends StatelessWidget {
   double calculateTotalCost() {
     double total = 0.0;
     selectedComponents.forEach((componentType, details) {
-      if (details != null && details.containsKey('price')) {
+      if (details.containsKey('price')) {
         String priceString = details['price'] ?? '0';
         total +=
             double.tryParse(priceString.replaceAll(RegExp(r'[^0-9.]'), '')) ??
@@ -30,7 +32,6 @@ class ResultPage extends StatelessWidget {
 
   Future<Uint8List> generatePdf() async {
     final pdf = pw.Document();
-
     final font = await PdfGoogleFonts.robotoRegular();
     final boldFont = await PdfGoogleFonts.robotoBold();
 
@@ -43,32 +44,18 @@ class ResultPage extends StatelessWidget {
           pw.Text('Build Summary',
               style: pw.TextStyle(font: boldFont, fontSize: 24)),
           pw.SizedBox(height: 20),
-          ...selectedComponents.entries.map((entry) {
-            var details = entry.value;
-            return pw.Container(
-              margin: pw.EdgeInsets.symmetric(vertical: 10),
-              child: pw.Column(
-                crossAxisAlignment: pw.CrossAxisAlignment.start,
-                children: [
-                  pw.Text(
-                    entry.key.toUpperCase(),
-                    style: pw.TextStyle(font: boldFont, fontSize: 18),
-                  ),
-                  pw.SizedBox(height: 5),
-                  pw.Text('Name: ${details['name'] ?? 'Not selected'}',
-                      style: pw.TextStyle(font: font)),
-                  pw.Text('Price: ₹${details['price'] ?? '0'}',
-                      style: pw.TextStyle(font: font)),
-                  if (details['link'] != null)
-                    pw.Padding(
-                      padding: pw.EdgeInsets.only(top: 10),
-                      child: pw.Text('Link: ${details['link']!}',
-                          style: pw.TextStyle(font: font)),
-                    ),
-                ],
-              ),
-            );
-          }).toList(),
+          pw.Table.fromTextArray(
+            headers: ['Component', 'Name', 'Price', 'Link'],
+            data: selectedComponents.entries.map((entry) {
+              var details = entry.value;
+              return [
+                entry.key.toUpperCase(),
+                details['name'] ?? 'Not selected',
+                '₹${details['price'] ?? '0'}',
+                details['link'] ?? 'N/A',
+              ];
+            }).toList(),
+          ),
           pw.SizedBox(height: 20),
           pw.Text('Installation Instructions',
               style: pw.TextStyle(font: boldFont, fontSize: 22)),
@@ -139,30 +126,63 @@ class ResultPage extends StatelessWidget {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
-            ...selectedComponents.entries.map((entry) {
-              var details = entry.value;
-              return Card(
-                margin: const EdgeInsets.symmetric(vertical: 10),
-                child: ListTile(
-                  contentPadding: const EdgeInsets.all(16),
-                  title: Text(
-                    entry.key.toUpperCase(),
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Name: ${details['name'] ?? 'Not selected'}'),
-                      Text('Price: ₹${details['price'] ?? '0'}'),
-                      const SizedBox(height: 10),
-                      if (details['link'] != null)
-                        Text('Link: ${details['link']!}'),
-                    ],
-                  ),
+            Table(
+              border: TableBorder.all(),
+              columnWidths: const {
+                0: FixedColumnWidth(150),
+                1: FlexColumnWidth(),
+                2: FixedColumnWidth(80),
+                3: FixedColumnWidth(100),
+              },
+              children: [
+                const TableRow(
+                  children: [
+                    Text('Component',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text('Name', style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text('Price',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text('Link', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ],
                 ),
-              );
-            }).toList(),
+                ...selectedComponents.entries.map((entry) {
+                  var details = entry.value;
+                  return TableRow(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(entry.key.toUpperCase()),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(details['name'] ?? 'Not selected'),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text('₹${details['price'] ?? '0'}'),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: GestureDetector(
+                          onTap: () async {
+                            if (details['link'] != null) {
+                              final url = details['link']!;
+                              if (await canLaunch(url)) {
+                                await launch(url);
+                              }
+                            }
+                          },
+                          child: Text(
+                            details['link'] ?? 'N/A',
+                            style: const TextStyle(color: Colors.blue),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }),
+              ],
+            ),
             const SizedBox(height: 20),
             const Text(
               'Installation Instructions',
@@ -171,33 +191,12 @@ class ResultPage extends StatelessWidget {
             const SizedBox(height: 10),
             const Text(
               '1. Install the CPU onto the motherboard.\n'
-              '   - Open the CPU socket lever.\n'
-              '   - Align the CPU with the socket using the notches.\n'
-              '   - Gently place the CPU into the socket and secure it with the lever.\n'
               '2. Install the CPU cooler.\n'
-              '   - Apply thermal paste to the CPU if needed.\n'
-              '   - Attach the cooler to the CPU and secure it with the provided brackets.\n'
-              '   - Connect the cooler’s power cable to the motherboard.\n'
               '3. Install the RAM into the RAM slots.\n'
-              '   - Open the RAM slot levers.\n'
-              '   - Align the RAM module with the slot and press down firmly until it clicks.\n'
               '4. Attach the storage devices (SSD/HDD).\n'
-              '   - Place the storage devices into the appropriate bays or slots.\n'
-              '   - Secure them with screws if needed.\n'
-              '   - Connect the data and power cables to the storage devices.\n'
               '5. Connect the power supply to the motherboard, CPU, and other components.\n'
-              '   - Attach the 24-pin ATX power connector to the motherboard.\n'
-              '   - Connect the 8-pin CPU power connector.\n'
-              '   - Connect power cables to the GPU, storage devices, and any additional components.\n'
               '6. Install the GPU into the PCI-E slot.\n'
-              '   - Remove the corresponding backplate(s) on the case.\n'
-              '   - Insert the GPU into the PCI-E slot and secure it with screws.\n'
-              '   - Connect the GPU power cables.\n'
-              '7. Connect all necessary cables (front panel, USB, audio, etc.) and power on the system.\n'
-              '   - Connect front panel connectors to the motherboard.\n'
-              '   - Connect USB, audio, and any other necessary cables.\n'
-              '   - Double-check all connections and secure any loose cables with cable ties.\n'
-              '   - Power on the system and ensure all components are recognized and functioning correctly.',
+              '7. Connect all necessary cables (front panel, USB, audio, etc.) and power on the system.\n',
               style: TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 20),
