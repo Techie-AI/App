@@ -7,7 +7,6 @@ class OptionsScreen extends StatefulWidget {
   const OptionsScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _OptionsScreenState createState() => _OptionsScreenState();
 }
 
@@ -33,7 +32,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
             child: SingleChildScrollView(
               child: LayoutBuilder(
                 builder: (context, constraints) {
-                  double width = constraints.maxWidth * 0.9;
+                  double width = constraints.maxWidth;
 
                   return Container(
                     padding: const EdgeInsets.all(16.0),
@@ -41,58 +40,78 @@ class _OptionsScreenState extends State<OptionsScreen> {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Select the type of PC you want to build:',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(height: 16),
-                        SizedBox(
-                          width: width,
-                          child: GridView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 3,
-                              childAspectRatio: 1,
-                              crossAxisSpacing: 10,
-                              mainAxisSpacing: 10,
-                            ),
-                            itemCount: pcOptions.length,
-                            itemBuilder: (context, index) {
-                              final option = pcOptions[index];
-                              return GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    selectedPcType = option.name;
-                                  });
-                                },
-                                child: Card(
-                                  elevation: 4,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                        Container(
+                          width: width < 600
+                              ? width
+                              : 600, // Adjust width for responsiveness
+                          padding: const EdgeInsets.all(16.0),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[200],
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Select the type of PC you want to build:',
+                                style: TextStyle(
+                                    fontSize: 20, fontWeight: FontWeight.bold),
+                              ),
+                              const SizedBox(height: 16),
+                              SizedBox(
+                                width: width,
+                                child: GridView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  gridDelegate:
+                                      const SliverGridDelegateWithFixedCrossAxisCount(
+                                    crossAxisCount: 3,
+                                    childAspectRatio: 1,
+                                    crossAxisSpacing: 10,
+                                    mainAxisSpacing: 10,
                                   ),
-                                  color: selectedPcType == option.name
-                                      ? Colors.blue.withOpacity(0.3)
-                                      : Colors.white,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Image.asset(option.image, height: 50),
-                                      const SizedBox(height: 10),
-                                      Text(option.name,
-                                          textAlign: TextAlign.center),
-                                    ],
-                                  ),
+                                  itemCount: pcOptions.length,
+                                  itemBuilder: (context, index) {
+                                    final option = pcOptions[index];
+                                    return GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          selectedPcType = option.name;
+                                        });
+                                      },
+                                      child: Card(
+                                        elevation: 4,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        color: selectedPcType == option.name
+                                            ? Colors.blue.withOpacity(0.3)
+                                            : Colors.white,
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Image.asset(option.image,
+                                                height: 50),
+                                            const SizedBox(height: 10),
+                                            Text(option.name,
+                                                textAlign: TextAlign.center),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
                                 ),
-                              );
-                            },
+                              ),
+                            ],
                           ),
                         ),
                         const SizedBox(height: 20),
                         SizedBox(
-                          width: width,
+                          width: width < 600
+                              ? width
+                              : 600, // Adjust width for responsiveness
                           child: Card(
                             elevation: 4,
                             shape: RoundedRectangleBorder(
@@ -153,7 +172,6 @@ class _OptionsScreenState extends State<OptionsScreen> {
     final budget = budgetController.text;
 
     if (selectedPcType.isEmpty || budget.isEmpty) {
-      // Show an error message if either field is empty
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
             content: Text('Please select a PC type and enter a budget')),
@@ -174,7 +192,6 @@ class _OptionsScreenState extends State<OptionsScreen> {
       });
 
       Navigator.push(
-        // ignore: use_build_context_synchronously
         context,
         MaterialPageRoute(
           builder: (context) => ComponentOption(budget: budget, data: data),
@@ -185,7 +202,6 @@ class _OptionsScreenState extends State<OptionsScreen> {
         isLoading = false;
       });
 
-      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to load data: $e')),
       );
@@ -204,7 +220,6 @@ class LoadingIndicator extends StatefulWidget {
   const LoadingIndicator({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
   _LoadingIndicatorState createState() => _LoadingIndicatorState();
 }
 
