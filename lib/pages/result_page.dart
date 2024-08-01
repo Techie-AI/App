@@ -35,7 +35,7 @@ class ResultPage extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            Text(
+            const Text(
               'Build Summary',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
@@ -83,14 +83,14 @@ class ResultPage extends StatelessWidget {
                   ),
                 );
               }
-            }).toList(),
+            }),
             const SizedBox(height: 20),
-            Text(
+            const Text(
               'Installation Instructions',
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            Text(
+            const Text(
               '1. Install the CPU onto the motherboard.\n'
               '2. Install the RAM into the RAM slots.\n'
               '3. Attach the storage devices.\n'
@@ -100,7 +100,7 @@ class ResultPage extends StatelessWidget {
               style: TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 20),
-            Text(
+            const Text(
               'Balance Sheet',
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
@@ -109,7 +109,7 @@ class ResultPage extends StatelessWidget {
               'Total Cost: ₹${totalCost.toStringAsFixed(2)}\n'
               'Initial Budget: ₹${initialBudget.toStringAsFixed(2)}\n'
               'Remaining Budget: ₹${remainingBudget.toStringAsFixed(2)}',
-              style: TextStyle(fontSize: 18),
+              style: const TextStyle(fontSize: 18),
             ),
             const SizedBox(height: 20),
           ],

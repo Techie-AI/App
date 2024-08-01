@@ -5,6 +5,7 @@ class AnimatedWelcomeText extends StatefulWidget {
   const AnimatedWelcomeText({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _AnimatedWelcomeTextState createState() => _AnimatedWelcomeTextState();
 }
 

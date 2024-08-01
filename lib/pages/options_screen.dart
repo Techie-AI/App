@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:techie_ai/models/loading_indicator.dart';
-import '../models/pc_options_model.dart';
 import 'component_option_screen.dart';
 import '../service/response_provider.dart';
 
@@ -9,6 +7,7 @@ class OptionsScreen extends StatefulWidget {
   const OptionsScreen({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _OptionsScreenState createState() => _OptionsScreenState();
 }
 
@@ -48,11 +47,11 @@ class _OptionsScreenState extends State<OptionsScreen> {
                               fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 16),
-                        Container(
+                        SizedBox(
                           width: width,
                           child: GridView.builder(
                             shrinkWrap: true,
-                            physics: NeverScrollableScrollPhysics(),
+                            physics: const NeverScrollableScrollPhysics(),
                             gridDelegate:
                                 const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 3,
@@ -92,7 +91,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
                           ),
                         ),
                         const SizedBox(height: 20),
-                        Container(
+                        SizedBox(
                           width: width,
                           child: Card(
                             elevation: 4,
@@ -175,6 +174,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
       });
 
       Navigator.push(
+        // ignore: use_build_context_synchronously
         context,
         MaterialPageRoute(
           builder: (context) => ComponentOption(budget: budget, data: data),
@@ -185,6 +185,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
         isLoading = false;
       });
 
+      // ignore: use_build_context_synchronously
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to load data: $e')),
       );
@@ -200,7 +201,10 @@ class PcOption {
 }
 
 class LoadingIndicator extends StatefulWidget {
+  const LoadingIndicator({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _LoadingIndicatorState createState() => _LoadingIndicatorState();
 }
 

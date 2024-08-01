@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 
 class LoadingIndicator extends StatefulWidget {
-  LoadingIndicator({super.key});
+  const LoadingIndicator({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
   _LoadingIndicatorState createState() => _LoadingIndicatorState();
 }
 
-class _LoadingIndicatorState extends State<LoadingIndicator> with SingleTickerProviderStateMixin {
+class _LoadingIndicatorState extends State<LoadingIndicator>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<int> _animation;
   List<String> images = [
@@ -25,7 +26,8 @@ class _LoadingIndicatorState extends State<LoadingIndicator> with SingleTickerPr
       vsync: this,
     )..repeat();
 
-    _animation = IntTween(begin: 0, end: images.length - 1).animate(_controller);
+    _animation =
+        IntTween(begin: 0, end: images.length - 1).animate(_controller);
   }
 
   @override
