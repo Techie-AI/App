@@ -25,7 +25,7 @@ class _ComponentOptionState extends State<ComponentOption> {
 
   void updateBudget(double price, bool isSelected) {
     setState(() {
-      currentBudget += isSelected ? -price : price;
+      currentBudget += isSelected ? price : -price;
     });
   }
 
@@ -109,7 +109,7 @@ class _ComponentOptionState extends State<ComponentOption> {
                                           selectedComponents[componentType] ==
                                               null;
 
-                                      updateBudget(price, isSelected);
+                                      updateBudget(price, !isSelected);
 
                                       if (isSelected) {
                                         selectedComponents[componentType] = {
@@ -162,7 +162,7 @@ class _ComponentOptionState extends State<ComponentOption> {
                                           selectedComponents[componentType] ==
                                               null;
 
-                                      updateBudget(price, isSelected);
+                                      updateBudget(price, !isSelected);
 
                                       if (isSelected) {
                                         selectedComponents[componentType] = {
