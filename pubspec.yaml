@@ -36,5 +36,11 @@ flutter:
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   assets:
-    - .env 
+    - .env
+    - assets/gaming_pc.png
+    - assets/office_pc.png
+    - assets/personal_pc.png
+    - assets/loading1.png
+    - assets/loading2.png
+    - assets/loading3.png
     # - assets/images/logo.png
