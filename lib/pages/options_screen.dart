@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:techie_ai/pages/component_option_screen.dart';
-import 'package:techie_ai/service/response_provider.dart';
+import 'package:techie_ai/models/loading_indicator.dart';
+import '../models/pc_options_model.dart';
+import 'component_option_screen.dart';
+import '../service/response_provider.dart';
 
 class OptionsScreen extends StatefulWidget {
   const OptionsScreen({super.key});
@@ -134,7 +136,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
             ),
           ),
           if (isLoading)
-            Center(
+            const Center(
               child: LoadingIndicator(),
             ),
         ],
@@ -170,7 +172,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => BudgetResultScreen(budget: budget, data: data),
+          builder: (context) => ComponentOption(budget: budget, data: data),
         ),
       );
     } catch (e) {
@@ -182,58 +184,5 @@ class _OptionsScreenState extends State<OptionsScreen> {
         SnackBar(content: Text('Failed to load data: $e')),
       );
     }
-  }
-}
-
-class PcOption {
-  final String name;
-  final String image;
-
-  PcOption({required this.name, required this.image});
-}
-
-class LoadingIndicator extends StatefulWidget {
-  @override
-  _LoadingIndicatorState createState() => _LoadingIndicatorState();
-}
-
-class _LoadingIndicatorState extends State<LoadingIndicator> with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<int> _animation;
-  List<String> images = [
-    'assets/loading1.png',
-    'assets/loading2.png',
-    'assets/loading3.png',
-  ];
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(seconds: 1),
-      vsync: this,
-    )..repeat();
-
-    _animation = IntTween(begin: 0, end: images.length - 1).animate(_controller);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _animation,
-      builder: (context, child) {
-        return Image.asset(
-          images[_animation.value],
-          height: 100,
-          width: 100,
-        );
-      },
-    );
   }
 }
