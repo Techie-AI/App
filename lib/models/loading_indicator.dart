@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class LoadingIndicator extends StatefulWidget {
-  const LoadingIndicator({super.key});
+  LoadingIndicator({super.key});
 
   @override
   // ignore: library_private_types_in_public_api
