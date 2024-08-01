@@ -14,7 +14,7 @@ class ComponentOption extends StatefulWidget {
 class _ComponentOptionState extends State<ComponentOption> {
   late double currentBudget;
   Map<String, dynamic> componentData = {};
-  Map<String, String?> selectedComponents = {};
+  Map<String, Map<String, String?>> selectedComponents = {};
 
   @override
   void initState() {
@@ -35,6 +35,7 @@ class _ComponentOptionState extends State<ComponentOption> {
       MaterialPageRoute(
         builder: (context) => ResultPage(
           selectedComponents: selectedComponents,
+          initialBudget: double.tryParse(widget.budget) ?? 0.0,
         ),
       ),
     );
@@ -94,10 +95,26 @@ class _ComponentOptionState extends State<ComponentOption> {
                           componentData[componentType],
                           (String? value) {
                             setState(() {
-                              selectedComponents[componentType] = value;
-                              double price = double.parse(
-                                  value!.split(' - ₹')[1].replaceAll(',', ''));
-                              updateBudget(price);
+                              // Extract name and price from the value
+                              if (value != null) {
+                                var parts = value.split(' - ₹');
+                                var name = parts[0];
+                                var priceString = parts[1];
+
+                                // Convert price to double
+                                double price =
+                                    double.tryParse(priceString) ?? 0.0;
+                                updateBudget(price);
+
+                                // Update selected components map
+                                selectedComponents[componentType] = {
+                                  'name': name,
+                                  'price': priceString,
+                                };
+                              } else {
+                                // Handle deselection
+                                selectedComponents.remove(componentType);
+                              }
                             });
                           },
                         );
@@ -147,7 +164,9 @@ class _ComponentOptionState extends State<ComponentOption> {
             const SizedBox(height: 10),
             DropdownButton<String?>(
               isExpanded: true,
-              value: selectedComponents[title.toLowerCase()],
+              value: selectedComponents[title.toLowerCase()] != null
+                  ? '${selectedComponents[title.toLowerCase()]!['name']} - ₹${selectedComponents[title.toLowerCase()]!['price']}'
+                  : null,
               hint: const Text('Select an option'),
               onChanged: onChanged,
               items: options.map<DropdownMenuItem<String>>((dynamic option) {
