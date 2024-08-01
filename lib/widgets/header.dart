@@ -1,22 +1,30 @@
 import 'package:flutter/material.dart';
 
 class Header extends StatelessWidget {
+  const Header({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16.0),
-      color: Colors.blue,
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFF274fa8),
+            Color(0xFF0072c0),
+            Color(0xFF0090bf),
+          ],
+          begin: Alignment.bottomCenter,
+          end: Alignment.topCenter,
+        ),
+      ),
       width: double.infinity,
       child: const Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          // Image.asset(
-          //   'assets/images/logo.png',
-          //   height: 80,
-          // ),
           SizedBox(width: 10),
           Text(
-            'TecheAi',
+            'TechieAi',
             style: TextStyle(
               fontSize: 30,
               color: Colors.white,
