@@ -44,7 +44,8 @@ class _OptionsScreenState extends State<OptionsScreen> {
                       children: [
                         const Text(
                           'Select the type of PC you want to build:',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 16),
                         Container(
@@ -52,7 +53,8 @@ class _OptionsScreenState extends State<OptionsScreen> {
                           child: GridView.builder(
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 3,
                               childAspectRatio: 1,
                               crossAxisSpacing: 10,
@@ -80,7 +82,8 @@ class _OptionsScreenState extends State<OptionsScreen> {
                                     children: [
                                       Image.asset(option.image, height: 50),
                                       const SizedBox(height: 10),
-                                      Text(option.name, textAlign: TextAlign.center),
+                                      Text(option.name,
+                                          textAlign: TextAlign.center),
                                     ],
                                   ),
                                 ),
@@ -104,7 +107,8 @@ class _OptionsScreenState extends State<OptionsScreen> {
                                   const Text(
                                     'Enter your budget:',
                                     style: TextStyle(
-                                        fontSize: 18, fontWeight: FontWeight.bold),
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),
                                   ),
                                   const SizedBox(height: 10),
                                   TextField(
@@ -152,7 +156,8 @@ class _OptionsScreenState extends State<OptionsScreen> {
     if (selectedPcType.isEmpty || budget.isEmpty) {
       // Show an error message if either field is empty
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a PC type and enter a budget')),
+        const SnackBar(
+            content: Text('Please select a PC type and enter a budget')),
       );
       return;
     }
@@ -184,5 +189,60 @@ class _OptionsScreenState extends State<OptionsScreen> {
         SnackBar(content: Text('Failed to load data: $e')),
       );
     }
+  }
+}
+
+class PcOption {
+  final String name;
+  final String image;
+
+  PcOption({required this.name, required this.image});
+}
+
+class LoadingIndicator extends StatefulWidget {
+  @override
+  _LoadingIndicatorState createState() => _LoadingIndicatorState();
+}
+
+class _LoadingIndicatorState extends State<LoadingIndicator>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<int> _animation;
+  List<String> images = [
+    'assets/loading1.png',
+    'assets/loading2.png',
+    'assets/loading3.png',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    )..repeat();
+
+    _animation =
+        IntTween(begin: 0, end: images.length - 1).animate(_controller);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        return Image.asset(
+          images[_animation.value],
+          height: 100,
+          width: 100,
+        );
+      },
+    );
   }
 }
