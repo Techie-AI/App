@@ -42,7 +42,8 @@ class _OptionsScreenState extends State<OptionsScreen> {
                       children: [
                         const Text(
                           'Select the type of PC you want to build:',
-                          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 16),
                         Container(
@@ -50,7 +51,8 @@ class _OptionsScreenState extends State<OptionsScreen> {
                           child: GridView.builder(
                             shrinkWrap: true,
                             physics: NeverScrollableScrollPhysics(),
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
                               crossAxisCount: 3,
                               childAspectRatio: 1,
                               crossAxisSpacing: 10,
@@ -78,7 +80,8 @@ class _OptionsScreenState extends State<OptionsScreen> {
                                     children: [
                                       Image.asset(option.image, height: 50),
                                       const SizedBox(height: 10),
-                                      Text(option.name, textAlign: TextAlign.center),
+                                      Text(option.name,
+                                          textAlign: TextAlign.center),
                                     ],
                                   ),
                                 ),
@@ -102,7 +105,8 @@ class _OptionsScreenState extends State<OptionsScreen> {
                                   const Text(
                                     'Enter your budget:',
                                     style: TextStyle(
-                                        fontSize: 18, fontWeight: FontWeight.bold),
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold),
                                   ),
                                   const SizedBox(height: 10),
                                   TextField(
@@ -150,7 +154,8 @@ class _OptionsScreenState extends State<OptionsScreen> {
     if (selectedPcType.isEmpty || budget.isEmpty) {
       // Show an error message if either field is empty
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a PC type and enter a budget')),
+        const SnackBar(
+            content: Text('Please select a PC type and enter a budget')),
       );
       return;
     }
@@ -170,7 +175,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => BudgetResultScreen(budget: budget, data: data),
+          builder: (context) => ComponentOption(budget: budget, data: data),
         ),
       );
     } catch (e) {
@@ -197,7 +202,8 @@ class LoadingIndicator extends StatefulWidget {
   _LoadingIndicatorState createState() => _LoadingIndicatorState();
 }
 
-class _LoadingIndicatorState extends State<LoadingIndicator> with SingleTickerProviderStateMixin {
+class _LoadingIndicatorState extends State<LoadingIndicator>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<int> _animation;
   List<String> images = [
@@ -214,7 +220,8 @@ class _LoadingIndicatorState extends State<LoadingIndicator> with SingleTickerPr
       vsync: this,
     )..repeat();
 
-    _animation = IntTween(begin: 0, end: images.length - 1).animate(_controller);
+    _animation =
+        IntTween(begin: 0, end: images.length - 1).animate(_controller);
   }
 
   @override
