@@ -20,14 +20,9 @@ class Header extends StatelessWidget {
       child: const Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          // Uncomment and provide your logo path if needed
-          // Image.asset(
-          //   'assets/images/logo.png',
-          //   height: 80,
-          // ),
           SizedBox(width: 10),
           Text(
-            'TecheAi',
+            'TechieAi',
             style: TextStyle(
               fontSize: 30,
               color: Colors.white,

@@ -48,7 +48,8 @@ class HomePage extends StatelessWidget {
           ),
           // Positioned button
           Positioned(
-            bottom: 350, // Distance from the bottom of the screen
+            bottom:
+                MediaQuery.of(context).size.height * 0.300, // Relative position
             left: 0,
             right: 0,
             child: Center(

@@ -19,9 +19,9 @@ class _AnimatedWelcomeTextState extends State<AnimatedWelcomeText>
     _animationController = AnimationController(
       duration: const Duration(seconds: 2),
       vsync: this,
-    )..repeat(reverse: true); // Repeats animation in reverse as well
+    )..repeat(reverse: true);
 
-    _animation = Tween<double>(begin: 100.0, end: 500.0).animate(
+    _animation = Tween<double>(begin: 100.0, end: 300.0).animate(
       CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
     );
   }
@@ -34,6 +34,8 @@ class _AnimatedWelcomeTextState extends State<AnimatedWelcomeText>
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
     return Center(
       child: Stack(
         alignment: Alignment.center,
@@ -46,8 +48,7 @@ class _AnimatedWelcomeTextState extends State<AnimatedWelcomeText>
                 height: _animation.value,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.blueAccent
-                      .withOpacity(0.5), // Semi-transparent blue color
+                  color: Colors.blueAccent.withOpacity(0.5),
                 ),
               );
             },
@@ -56,10 +57,10 @@ class _AnimatedWelcomeTextState extends State<AnimatedWelcomeText>
             animatedTexts: [
               TypewriterAnimatedText(
                 'Welcome to TechieAi!',
-                textStyle: const TextStyle(
-                  fontSize: 100,
+                textStyle: TextStyle(
+                  fontSize: screenWidth * 0.061,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black, // White text color for contrast
+                  color: Colors.black,
                 ),
                 speed: const Duration(milliseconds: 200),
               ),

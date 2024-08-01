@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 class Footer extends StatelessWidget {
   const Footer({super.key});
 
@@ -11,7 +12,7 @@ class Footer extends StatelessWidget {
       child: const Column(
         children: [
           Text(
-            '© 2024 TecheAi',
+            '© 2024 TechieAi',
             style: TextStyle(
               fontSize: 16,
               color: Colors.black54,
