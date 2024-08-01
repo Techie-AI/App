@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:ui';
 import 'component_option_screen.dart';
 import '../service/response_provider.dart';
 
@@ -158,8 +159,18 @@ class _OptionsScreenState extends State<OptionsScreen> {
             ),
           ),
           if (isLoading)
-            const Center(
-              child: LoadingIndicator(),
+            Stack(
+              children: [
+                BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                  child: Container(
+                    color: Colors.black.withOpacity(0.5),
+                  ),
+                ),
+                const Center(
+                  child: LoadingIndicator(),
+                ),
+              ],
             ),
         ],
       ),
