@@ -112,6 +112,7 @@ class ResultPage extends StatelessWidget {
   Widget build(BuildContext context) {
     double totalCost = calculateTotalCost();
     double remainingBudget = initialBudget - totalCost;
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       appBar: AppBar(
@@ -121,95 +122,219 @@ class ResultPage extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            const Text(
-              'Build Summary',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            Table(
-              border: TableBorder.all(),
-              columnWidths: const {
-                0: FixedColumnWidth(150),
-                1: FlexColumnWidth(),
-                2: FixedColumnWidth(80),
-                3: FixedColumnWidth(100),
-              },
-              children: [
-                const TableRow(
-                  children: [
-                    Text('Component',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text('Name', style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text('Price',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text('Link', style: TextStyle(fontWeight: FontWeight.bold)),
-                  ],
-                ),
-                ...selectedComponents.entries.map((entry) {
-                  var details = entry.value;
-                  return TableRow(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(entry.key.toUpperCase()),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text(details['name'] ?? 'Not selected'),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Text('₹${details['price'] ?? '0'}'),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: GestureDetector(
-                          onTap: () async {
-                            if (details['link'] != null) {
-                              final url = details['link']!;
-                              if (await canLaunch(url)) {
-                                await launch(url);
-                              }
-                            }
+            Container(
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Colors.deepPurple.shade50,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 2,
+                    blurRadius: 5,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Build Summary',
+                    style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.deepPurple),
+                  ),
+                  const SizedBox(height: 20),
+                  Table(
+                    border: TableBorder.all(color: Colors.deepPurple),
+                    columnWidths: screenWidth < 600
+                        ? {
+                            0: FlexColumnWidth(),
+                            1: FlexColumnWidth(),
+                            2: FlexColumnWidth(),
+                            3: FlexColumnWidth(),
+                          }
+                        : {
+                            0: FlexColumnWidth(),
+                            1: FlexColumnWidth(),
+                            2: FlexColumnWidth(),
+                            3: FlexColumnWidth(),
                           },
-                          child: Text(
-                            details['link'] ?? 'N/A',
-                            style: const TextStyle(color: Colors.blue),
-                          ),
+                    children: [
+                      const TableRow(
+                        decoration: BoxDecoration(
+                          color: Colors.deepPurple,
                         ),
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text(
+                              'Component',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text(
+                              'Name',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text(
+                              'Price',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text(
+                              'Link',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                            ),
+                          ),
+                        ],
                       ),
+                      ...selectedComponents.entries.map((entry) {
+                        var details = entry.value;
+                        return TableRow(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(entry.key.toUpperCase()),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(details['name'] ?? 'Not selected'),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text('₹${details['price'] ?? '0'}'),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: GestureDetector(
+                                onTap: () async {
+                                  if (details['link'] != null) {
+                                    final url = details['link']!;
+                                    if (await canLaunch(url)) {
+                                      await launch(url);
+                                    }
+                                  }
+                                },
+                                child: Text(
+                                  details['link'] ?? 'N/A',
+                                  style: const TextStyle(color: Colors.blue),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      }),
                     ],
-                  );
-                }),
-              ],
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 20),
-            const Text(
-              'Installation Instructions',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            const Text(
-              '1. Install the CPU onto the motherboard.\n'
-              '2. Install the CPU cooler.\n'
-              '3. Install the RAM into the RAM slots.\n'
-              '4. Attach the storage devices (SSD/HDD).\n'
-              '5. Connect the power supply to the motherboard, CPU, and other components.\n'
-              '6. Install the GPU into the PCI-E slot.\n'
-              '7. Connect all necessary cables (front panel, USB, audio, etc.) and power on the system.\n',
-              style: TextStyle(fontSize: 16),
+            Container(
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 2,
+                    blurRadius: 5,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Installation Instructions',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    '1. Install the CPU onto the motherboard.\n'
+                    '   - Open the CPU socket lever.\n'
+                    '   - Align the CPU with the socket using the notches.\n'
+                    '   - Gently place the CPU into the socket and secure it with the lever.\n'
+                    '2. Install the CPU cooler.\n'
+                    '   - Apply thermal paste to the CPU if needed.\n'
+                    '   - Attach the cooler to the CPU and secure it with the provided brackets.\n'
+                    '   - Connect the cooler’s power cable to the motherboard.\n'
+                    '3. Install the RAM into the RAM slots.\n'
+                    '   - Open the RAM slot levers.\n'
+                    '   - Align the RAM module with the slot and press down firmly until it clicks.\n'
+                    '4. Attach the storage devices (SSD/HDD).\n'
+                    '   - Place the storage devices into the appropriate bays or slots.\n'
+                    '   - Secure them with screws if needed.\n'
+                    '   - Connect the data and power cables to the storage devices.\n'
+                    '5. Connect the power supply to the motherboard, CPU, and other components.\n'
+                    '   - Attach the 24-pin ATX power connector to the motherboard.\n'
+                    '   - Connect the 8-pin CPU power connector.\n'
+                    '   - Connect power cables to the GPU, storage devices, and any additional components.\n'
+                    '6. Install the GPU into the PCI-E slot.\n'
+                    '   - Remove the corresponding backplate(s) on the case.\n'
+                    '   - Insert the GPU into the PCI-E slot and secure it with screws.\n'
+                    '   - Connect the GPU power cables.\n'
+                    '7. Connect all necessary cables (front panel, USB, audio, etc.) and power on the system.\n'
+                    '   - Connect front panel connectors to the motherboard.\n'
+                    '   - Connect USB, audio, and any other necessary cables.\n'
+                    '   - Double-check all connections and secure any loose cables with cable ties.\n'
+                    '   - Power on the system and ensure all components are recognized and functioning correctly.',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 20),
-            const Text(
-              'Balance Sheet',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Total Cost: ₹${totalCost.toStringAsFixed(2)}\n'
-              'Initial Budget: ₹${initialBudget.toStringAsFixed(2)}\n'
-              'Remaining Budget: ₹${remainingBudget.toStringAsFixed(2)}',
-              style: const TextStyle(fontSize: 18),
+            Container(
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 2,
+                    blurRadius: 5,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Balance Sheet',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Total Cost: ₹${totalCost.toStringAsFixed(2)}\n'
+                    'Initial Budget: ₹${initialBudget.toStringAsFixed(2)}\n'
+                    'Remaining Budget: ₹${remainingBudget.toStringAsFixed(2)}',
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                ],
+              ),
             ),
             const SizedBox(height: 20),
             ElevatedButton(
@@ -219,6 +344,13 @@ class ResultPage extends StatelessWidget {
                   onLayout: (PdfPageFormat format) async => pdfData,
                 );
               },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple,
+                foregroundColor: Colors.white,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                textStyle: const TextStyle(fontSize: 18),
+              ),
               child: const Text('Print Document'),
             ),
           ],
