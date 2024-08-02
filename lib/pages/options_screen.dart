@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:ui';
 import 'component_option_screen.dart';
 import '../service/response_provider.dart';
 
@@ -86,14 +87,14 @@ class _OptionsScreenState extends State<OptionsScreen> {
                                               BorderRadius.circular(10),
                                         ),
                                         color: selectedPcType == option.name
-                                            ? Colors.blue.withOpacity(0.3)
+                                            ? Color.fromARGB(255, 0, 225, 255).withOpacity(0.3)
                                             : Colors.white,
                                         child: Column(
                                           mainAxisAlignment:
                                               MainAxisAlignment.center,
                                           children: [
                                             Image.asset(option.image,
-                                                height: 50),
+                                                height: 90),
                                             const SizedBox(height: 10),
                                             Text(option.name,
                                                 textAlign: TextAlign.center),
@@ -158,8 +159,18 @@ class _OptionsScreenState extends State<OptionsScreen> {
             ),
           ),
           if (isLoading)
-            const Center(
-              child: LoadingIndicator(),
+            Stack(
+              children: [
+                BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+                  child: Container(
+                    color: Colors.black.withOpacity(0.5),
+                  ),
+                ),
+                const Center(
+                  child: LoadingIndicator(),
+                ),
+              ],
             ),
         ],
       ),

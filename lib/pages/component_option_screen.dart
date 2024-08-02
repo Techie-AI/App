@@ -25,7 +25,7 @@ class _ComponentOptionState extends State<ComponentOption> {
 
   void updateBudget(double price, bool isSelected) {
     setState(() {
-      currentBudget += isSelected ? -price : price;
+      currentBudget += isSelected ? price : -price;
     });
   }
 
@@ -79,47 +79,108 @@ class _ComponentOptionState extends State<ComponentOption> {
               child: componentData.isNotEmpty
                   ? LayoutBuilder(
                       builder: (context, constraints) {
-                        int crossAxisCount = constraints.maxWidth > 600 ? 4 : 2;
-                        return GridView.builder(
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: crossAxisCount,
-                            childAspectRatio: 2,
-                            mainAxisSpacing: 10,
-                            crossAxisSpacing: 10,
-                          ),
-                          itemCount: componentData.keys.length,
-                          itemBuilder: (context, index) {
-                            String componentType = componentData.keys.elementAt(index);
-                            return buildOptionCard(
-                              context,
-                              componentType.toUpperCase(),
-                              componentData[componentType],
-                              (String? value) {
-                                setState(() {
-                                  if (value != null) {
-                                    var parts = value.split(' - ₹');
-                                    var name = parts[0];
-                                    var priceString = parts[1];
-                                    double price = double.tryParse(priceString) ?? 0.0;
+                        if (constraints.maxWidth < 600) {
+                          // Mobile layout (List)
+                          return ListView.builder(
+                            itemCount: componentData.keys.length,
+                            itemBuilder: (context, index) {
+                              String componentType =
+                                  componentData.keys.elementAt(index);
+                              return buildOptionCard(
+                                context,
+                                componentType.toUpperCase(),
+                                componentData[componentType],
+                                (String? value) {
+                                  setState(() {
+                                    if (value != null) {
+                                      var parts = value.split(' - ₹');
+                                      var name = parts[0];
+                                      var priceString = parts[1];
+                                      double price =
+                                          double.tryParse(priceString) ?? 0.0;
+                                      String? link =
+                                          componentData[componentType]
+                                              .firstWhere(
+                                        (option) => option['name'] == name,
+                                        orElse: () => {},
+                                      )['link'];
 
-                                    bool isSelected = selectedComponents[componentType] == null;
+                                      bool isSelected =
+                                          selectedComponents[componentType] ==
+                                              null;
 
-                                    updateBudget(price, isSelected);
+                                      updateBudget(price, !isSelected);
 
-                                    if (isSelected) {
-                                      selectedComponents[componentType] = {
-                                        'name': name,
-                                        'price': priceString,
-                                      };
-                                    } else {
-                                      selectedComponents.remove(componentType);
+                                      if (isSelected) {
+                                        selectedComponents[componentType] = {
+                                          'name': name,
+                                          'price': priceString,
+                                          'link': link,
+                                        };
+                                      } else {
+                                        selectedComponents
+                                            .remove(componentType);
+                                      }
                                     }
-                                  }
-                                });
-                              },
-                            );
-                          },
-                        );
+                                  });
+                                },
+                              );
+                            },
+                          );
+                        } else {
+                          // Desktop layout (Grid)
+                          return GridView.builder(
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              childAspectRatio: 3,
+                            ),
+                            itemCount: componentData.keys.length,
+                            itemBuilder: (context, index) {
+                              String componentType =
+                                  componentData.keys.elementAt(index);
+                              return buildOptionCard(
+                                context,
+                                componentType.toUpperCase(),
+                                componentData[componentType],
+                                (String? value) {
+                                  setState(() {
+                                    if (value != null) {
+                                      var parts = value.split(' - ₹');
+                                      var name = parts[0];
+                                      var priceString = parts[1];
+                                      double price =
+                                          double.tryParse(priceString) ?? 0.0;
+                                      String? link =
+                                          componentData[componentType]
+                                              .firstWhere(
+                                        (option) => option['name'] == name,
+                                        orElse: () => {},
+                                      )['link'];
+
+                                      bool isSelected =
+                                          selectedComponents[componentType] ==
+                                              null;
+
+                                      updateBudget(price, !isSelected);
+
+                                      if (isSelected) {
+                                        selectedComponents[componentType] = {
+                                          'name': name,
+                                          'price': priceString,
+                                          'link': link,
+                                        };
+                                      } else {
+                                        selectedComponents
+                                            .remove(componentType);
+                                      }
+                                    }
+                                  });
+                                },
+                              );
+                            },
+                          );
+                        }
                       },
                     )
                   : const Center(child: CircularProgressIndicator()),
@@ -147,7 +208,8 @@ class _ComponentOptionState extends State<ComponentOption> {
     );
   }
 
-  Widget buildOptionCard(BuildContext context, String title, List<dynamic> options, ValueChanged<String?> onChanged) {
+  Widget buildOptionCard(BuildContext context, String title,
+      List<dynamic> options, ValueChanged<String?> onChanged) {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(
@@ -163,37 +225,35 @@ class _ComponentOptionState extends State<ComponentOption> {
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
-            Expanded(
-              child: ListView.builder(
-                itemCount: options.length,
-                itemBuilder: (context, index) {
-                  var option = options[index];
-                  var value = '${option['name']} - ₹${option['price']}';
-                  bool isSelected = selectedComponents[title.toLowerCase()] != null &&
-                      selectedComponents[title.toLowerCase()]!['name'] == option['name'];
+            Column(
+              children: options.map((option) {
+                var value = '${option['name']} - ₹${option['price']}';
+                bool isSelected =
+                    selectedComponents[title.toLowerCase()] != null &&
+                        selectedComponents[title.toLowerCase()]!['name'] ==
+                            option['name'];
 
-                  return GestureDetector(
-                    onTap: () => onChanged(isSelected ? null : value),
-                    child: Container(
-                      padding: const EdgeInsets.all(8.0),
-                      margin: const EdgeInsets.symmetric(vertical: 4.0),
-                      decoration: BoxDecoration(
-                        color: isSelected ? Colors.blueAccent : Colors.white,
-                        borderRadius: BorderRadius.circular(8.0),
-                        border: Border.all(
-                          color: isSelected ? Colors.blueAccent : Colors.grey,
-                        ),
-                      ),
-                      child: Text(
-                        value,
-                        style: TextStyle(
-                          color: isSelected ? Colors.white : Colors.black,
-                        ),
+                return GestureDetector(
+                  onTap: () => onChanged(isSelected ? null : value),
+                  child: Container(
+                    padding: const EdgeInsets.all(8.0),
+                    margin: const EdgeInsets.symmetric(vertical: 4.0),
+                    decoration: BoxDecoration(
+                      color: isSelected ? Colors.blueAccent : Colors.white,
+                      borderRadius: BorderRadius.circular(8.0),
+                      border: Border.all(
+                        color: isSelected ? Colors.blueAccent : Colors.grey,
                       ),
                     ),
-                  );
-                },
-              ),
+                    child: Text(
+                      value,
+                      style: TextStyle(
+                        color: isSelected ? Colors.white : Colors.black,
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
             ),
           ],
         ),
