@@ -11,9 +11,10 @@ class PdfGenerator {
     final pdf = pw.Document();
 
     pdf.addPage(
-      pw.Page(
-        build: (pw.Context context) {
-          return pw.Column(
+      pw.MultiPage(
+        pageFormat: PdfPageFormat.a4,
+        build: (pw.Context context) => [
+          pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
               pw.Text('Build Summary',
@@ -62,7 +63,7 @@ class PdfGenerator {
                         ),
                         pw.Padding(
                           padding: const pw.EdgeInsets.all(8.0),
-                          child: pw.Text('₹${details['price'] ?? '0'}'),
+                          child: pw.Text('${details['price'] ?? '0'}'),
                         ),
                       ],
                     );
@@ -118,7 +119,7 @@ class PdfGenerator {
                     style: const pw.TextStyle(fontSize: 18),
                   ),
                   pw.Text(
-                    '₹$totalCost',
+                    'Rs$totalCost',
                     style: const pw.TextStyle(fontSize: 18),
                   ),
                 ],
@@ -132,7 +133,7 @@ class PdfGenerator {
                     style: const pw.TextStyle(fontSize: 18),
                   ),
                   pw.Text(
-                    '₹$initialBudget',
+                    'Rs$initialBudget',
                     style: const pw.TextStyle(fontSize: 18),
                   ),
                 ],
@@ -150,7 +151,7 @@ class PdfGenerator {
                     ),
                   ),
                   pw.Text(
-                    '₹$initialBudget',
+                    'Rs$initialBudget',
                     style: pw.TextStyle(
                       fontSize: 18,
                       color:
@@ -160,8 +161,8 @@ class PdfGenerator {
                 ],
               ),
             ],
-          );
-        },
+          ),
+        ],
       ),
     );
 
