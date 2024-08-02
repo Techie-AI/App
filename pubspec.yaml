@@ -46,4 +46,4 @@ flutter:
     - assets/loading1.png
     - assets/loading2.png
     - assets/loading3.png
-    # - assets/images/logo.png
+    - assets/logo.png
