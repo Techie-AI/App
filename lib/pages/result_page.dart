@@ -1,18 +1,26 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
+import 'dart:typed_data';
+import 'package:url_launcher/url_launcher.dart'; // Import for handling links
 
 class ResultPage extends StatelessWidget {
   final Map<String, Map<String, String?>> selectedComponents;
   final double initialBudget;
 
-  const ResultPage(
-      {super.key,
-      required this.selectedComponents,
-      required this.initialBudget});
+  const ResultPage({
+    super.key,
+    required this.selectedComponents,
+    required this.initialBudget,
+  });
 
   double calculateTotalCost() {
     double total = 0.0;
     selectedComponents.forEach((componentType, details) {
-      if (details != null && details.containsKey('price')) {
+      if (details.containsKey('price')) {
         String priceString = details['price'] ?? '0';
         total +=
             double.tryParse(priceString.replaceAll(RegExp(r'[^0-9.]'), '')) ??
@@ -22,10 +30,89 @@ class ResultPage extends StatelessWidget {
     return total;
   }
 
+  Future<Uint8List> generatePdf() async {
+    final pdf = pw.Document();
+    final font = await PdfGoogleFonts.robotoRegular();
+    final boldFont = await PdfGoogleFonts.robotoBold();
+
+    double totalCost = calculateTotalCost();
+    double remainingBudget = initialBudget - totalCost;
+
+    pdf.addPage(
+      pw.MultiPage(
+        build: (pw.Context context) => [
+          pw.Text('Build Summary',
+              style: pw.TextStyle(font: boldFont, fontSize: 24)),
+          pw.SizedBox(height: 20),
+          pw.Table.fromTextArray(
+            headers: ['Component', 'Name', 'Price', 'Link'],
+            data: selectedComponents.entries.map((entry) {
+              var details = entry.value;
+              return [
+                entry.key.toUpperCase(),
+                details['name'] ?? 'Not selected',
+                '₹${details['price'] ?? '0'}',
+                details['link'] ?? 'N/A',
+              ];
+            }).toList(),
+          ),
+          pw.SizedBox(height: 20),
+          pw.Text('Installation Instructions',
+              style: pw.TextStyle(font: boldFont, fontSize: 22)),
+          pw.SizedBox(height: 10),
+          pw.Text(
+            '1. Install the CPU onto the motherboard.\n'
+            '   - Open the CPU socket lever.\n'
+            '   - Align the CPU with the socket using the notches.\n'
+            '   - Gently place the CPU into the socket and secure it with the lever.\n'
+            '2. Install the CPU cooler.\n'
+            '   - Apply thermal paste to the CPU if needed.\n'
+            '   - Attach the cooler to the CPU and secure it with the provided brackets.\n'
+            '   - Connect the cooler’s power cable to the motherboard.\n'
+            '3. Install the RAM into the RAM slots.\n'
+            '   - Open the RAM slot levers.\n'
+            '   - Align the RAM module with the slot and press down firmly until it clicks.\n'
+            '4. Attach the storage devices (SSD/HDD).\n'
+            '   - Place the storage devices into the appropriate bays or slots.\n'
+            '   - Secure them with screws if needed.\n'
+            '   - Connect the data and power cables to the storage devices.\n'
+            '5. Connect the power supply to the motherboard, CPU, and other components.\n'
+            '   - Attach the 24-pin ATX power connector to the motherboard.\n'
+            '   - Connect the 8-pin CPU power connector.\n'
+            '   - Connect power cables to the GPU, storage devices, and any additional components.\n'
+            '6. Install the GPU into the PCI-E slot.\n'
+            '   - Remove the corresponding backplate(s) on the case.\n'
+            '   - Insert the GPU into the PCI-E slot and secure it with screws.\n'
+            '   - Connect the GPU power cables.\n'
+            '7. Connect all necessary cables (front panel, USB, audio, etc.) and power on the system.\n'
+            '   - Connect front panel connectors to the motherboard.\n'
+            '   - Connect USB, audio, and any other necessary cables.\n'
+            '   - Double-check all connections and secure any loose cables with cable ties.\n'
+            '   - Power on the system and ensure all components are recognized and functioning correctly.',
+            style: pw.TextStyle(font: font, fontSize: 16),
+          ),
+          pw.SizedBox(height: 20),
+          pw.Text('Balance Sheet',
+              style: pw.TextStyle(font: boldFont, fontSize: 22)),
+          pw.SizedBox(height: 10),
+          pw.Text(
+            'Total Cost: ₹${totalCost.toStringAsFixed(2)}\n'
+            'Initial Budget: ₹${initialBudget.toStringAsFixed(2)}\n'
+            'Remaining Budget: ₹${remainingBudget.toStringAsFixed(2)}',
+            style: pw.TextStyle(font: font, fontSize: 18),
+          ),
+        ],
+      ),
+    );
+
+    return pdf.save();
+  }
+
   @override
   Widget build(BuildContext context) {
     double totalCost = calculateTotalCost();
     double remainingBudget = initialBudget - totalCost;
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
       appBar: AppBar(
@@ -35,99 +122,240 @@ class ResultPage extends StatelessWidget {
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            const Text(
-              'Build Summary',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            ...selectedComponents.entries.map((entry) {
-              var details = entry.value;
-              if (details != null) {
-                return Card(
-                  margin: const EdgeInsets.symmetric(vertical: 10),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.all(16),
-                    title: Text(
-                      entry.key.toUpperCase(),
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Name: ${details['name'] ?? 'Not selected'}'),
-                        Text('Price: ₹${details['price'] ?? '0'}'),
-                        const SizedBox(height: 10),
-                        if (details['link'] != null)
-                          ElevatedButton(
-                            onPressed: () {
-                              _launchURL(context, details['link']!);
-                            },
-                            child: const Text('Purchase / More Info'),
+            Container(
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Colors.deepPurple.shade50,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 2,
+                    blurRadius: 5,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Build Summary',
+                    style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.deepPurple),
+                  ),
+                  const SizedBox(height: 20),
+                  Table(
+                    border: TableBorder.all(color: Colors.deepPurple),
+                    columnWidths: screenWidth < 600
+                        ? {
+                            0: FlexColumnWidth(),
+                            1: FlexColumnWidth(),
+                            2: FlexColumnWidth(),
+                            3: FlexColumnWidth(),
+                          }
+                        : {
+                            0: FlexColumnWidth(),
+                            1: FlexColumnWidth(),
+                            2: FlexColumnWidth(),
+                            3: FlexColumnWidth(),
+                          },
+                    children: [
+                      const TableRow(
+                        decoration: BoxDecoration(
+                          color: Colors.deepPurple,
+                        ),
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text(
+                              'Component',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                            ),
                           ),
-                      ],
-                    ),
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text(
+                              'Name',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text(
+                              'Price',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: Text(
+                              'Link',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                      ...selectedComponents.entries.map((entry) {
+                        var details = entry.value;
+                        return TableRow(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(entry.key.toUpperCase()),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text(details['name'] ?? 'Not selected'),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Text('₹${details['price'] ?? '0'}'),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: GestureDetector(
+                                onTap: () async {
+                                  if (details['link'] != null) {
+                                    final url = details['link']!;
+                                    if (await canLaunch(url)) {
+                                      await launch(url);
+                                    }
+                                  }
+                                },
+                                child: Text(
+                                  details['link'] ?? 'N/A',
+                                  style: const TextStyle(color: Colors.blue),
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      }),
+                    ],
                   ),
-                );
-              } else {
-                return Card(
-                  margin: const EdgeInsets.symmetric(vertical: 10),
-                  child: ListTile(
-                    contentPadding: const EdgeInsets.all(16),
-                    title: Text(
-                      entry.key.toUpperCase(),
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold),
-                    ),
-                    subtitle: const Text('Not selected'),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            Container(
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 2,
+                    blurRadius: 5,
+                    offset: const Offset(0, 3),
                   ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Installation Instructions',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  const Text(
+                    '1. Install the CPU onto the motherboard.\n'
+                    '   - Open the CPU socket lever.\n'
+                    '   - Align the CPU with the socket using the notches.\n'
+                    '   - Gently place the CPU into the socket and secure it with the lever.\n'
+                    '2. Install the CPU cooler.\n'
+                    '   - Apply thermal paste to the CPU if needed.\n'
+                    '   - Attach the cooler to the CPU and secure it with the provided brackets.\n'
+                    '   - Connect the cooler’s power cable to the motherboard.\n'
+                    '3. Install the RAM into the RAM slots.\n'
+                    '   - Open the RAM slot levers.\n'
+                    '   - Align the RAM module with the slot and press down firmly until it clicks.\n'
+                    '4. Attach the storage devices (SSD/HDD).\n'
+                    '   - Place the storage devices into the appropriate bays or slots.\n'
+                    '   - Secure them with screws if needed.\n'
+                    '   - Connect the data and power cables to the storage devices.\n'
+                    '5. Connect the power supply to the motherboard, CPU, and other components.\n'
+                    '   - Attach the 24-pin ATX power connector to the motherboard.\n'
+                    '   - Connect the 8-pin CPU power connector.\n'
+                    '   - Connect power cables to the GPU, storage devices, and any additional components.\n'
+                    '6. Install the GPU into the PCI-E slot.\n'
+                    '   - Remove the corresponding backplate(s) on the case.\n'
+                    '   - Insert the GPU into the PCI-E slot and secure it with screws.\n'
+                    '   - Connect the GPU power cables.\n'
+                    '7. Connect all necessary cables (front panel, USB, audio, etc.) and power on the system.\n'
+                    '   - Connect front panel connectors to the motherboard.\n'
+                    '   - Connect USB, audio, and any other necessary cables.\n'
+                    '   - Double-check all connections and secure any loose cables with cable ties.\n'
+                    '   - Power on the system and ensure all components are recognized and functioning correctly.',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            Container(
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 2,
+                    blurRadius: 5,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Balance Sheet',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Total Cost: ₹${totalCost.toStringAsFixed(2)}\n'
+                    'Initial Budget: ₹${initialBudget.toStringAsFixed(2)}\n'
+                    'Remaining Budget: ₹${remainingBudget.toStringAsFixed(2)}',
+                    style: const TextStyle(fontSize: 18),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () async {
+                final pdfData = await generatePdf();
+                await Printing.layoutPdf(
+                  onLayout: (PdfPageFormat format) async => pdfData,
                 );
-              }
-            }),
-            const SizedBox(height: 20),
-            const Text(
-              'Installation Instructions',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple,
+                foregroundColor: Colors.white,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                textStyle: const TextStyle(fontSize: 18),
+              ),
+              child: const Text('Print Document'),
             ),
-            const SizedBox(height: 10),
-            const Text(
-              '1. Install the CPU onto the motherboard.\n'
-              '2. Install the RAM into the RAM slots.\n'
-              '3. Attach the storage devices.\n'
-              '4. Connect the power supply to the motherboard, CPU, and other components.\n'
-              '5. Install the GPU into the PCI-E slot.\n'
-              '6. Connect all necessary cables and power on the system.',
-              style: TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Balance Sheet',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Total Cost: ₹${totalCost.toStringAsFixed(2)}\n'
-              'Initial Budget: ₹${initialBudget.toStringAsFixed(2)}\n'
-              'Remaining Budget: ₹${remainingBudget.toStringAsFixed(2)}',
-              style: const TextStyle(fontSize: 18),
-            ),
-            const SizedBox(height: 20),
           ],
         ),
       ),
     );
-  }
-
-  void _launchURL(BuildContext context, String url) {
-    // You can use a package like `url_launcher` to open the URL
-    // Example:
-    // import 'package:url_launcher/url_launcher.dart';
-    // if (await canLaunch(url)) {
-    //   await launch(url);
-    // } else {
-    //   throw 'Could not launch $url';
-    // }
-    // For now, we'll just print the URL
-    print('Opening URL: $url');
   }
 }
