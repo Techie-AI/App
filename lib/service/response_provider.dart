@@ -35,8 +35,17 @@ class ResponseProvider extends ChangeNotifier {
     if (pcType.isEmpty || budget.isEmpty) return {};
 
     final content = [
-      Content.text(
-          'Hey, I want your advice on PC building. I want a $pcType but I have a budget of $budget INR. Can you give me multiple options for every component with prices and links to buy from, in JSON format? Give 3 options for each. JSON Example: {"components": {"cpu": {}, "motherboard": {}, ...}}')
+      Content.text('hey, i want your advice on pc building\n'
+          'i want a $pcType but i have $budget budget\n\n'
+          'can you give me multiple options for every component with prices\n'
+          'in only JSON\n\n'
+          'give 3 options for each\n\n'
+          'JSON Example \n'
+          '"components": {\n'
+          '    "cpu": {},\n'
+          '    "motherboard": {},\n'
+          '    ...\n'
+          '}')
     ];
 
     try {
@@ -53,6 +62,18 @@ class ResponseProvider extends ChangeNotifier {
 
       // Check the structure of the result and ensure it matches the expected format
       if (result.containsKey('components') && result['components'] is Map) {
+        // Add product links
+        result['components'].forEach((component, options) {
+          if (options is List) {
+            for (var option in options) {
+              if (option is Map && option.containsKey('name')) {
+                String productName = option['name'];
+                option['link'] =
+                    "https://www.amazon.in/s?k=${Uri.encodeComponent(productName)}";
+              }
+            }
+          }
+        });
         return result;
       } else {
         print("Unexpected JSON structure");
