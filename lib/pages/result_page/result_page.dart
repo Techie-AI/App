@@ -33,8 +33,9 @@ class ResultPage extends StatelessWidget {
   }
 
   Future<Uint8List> generatePdf() async {
+    double totalCost = calculateTotalCost();
     return PdfGenerator.generatePdf(
-        selectedComponents, initialBudget, calculateTotalCost as double);
+        selectedComponents, initialBudget, totalCost);
   }
 
   @override
