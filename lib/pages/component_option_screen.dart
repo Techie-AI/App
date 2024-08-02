@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'result_page.dart';
+import './result_page/result_page.dart';
 
 class ComponentOption extends StatefulWidget {
   final String budget;
