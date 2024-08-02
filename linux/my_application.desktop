@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=My Application
+Comment=My Flutter application
+Exec=path/to/executable
+Icon=app_icon
+Terminal=false
+Type=Application
+Categories=Utility;
