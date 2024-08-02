@@ -9,6 +9,10 @@ set(BINARY_NAME "techie_ai")
 # https://wiki.gnome.org/HowDoI/ChooseApplicationID
 set(APPLICATION_ID "com.example.techie_ai")
 
+set(PROJECT_ICON_48 "assets/icons/app_icon_48.png")
+set(PROJECT_ICON_128 "assets/icons/app_icon_128.png")
+set(PROJECT_ICON_256 "assets/icons/app_icon_256.png")
+
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.
 cmake_policy(SET CMP0063 NEW)
