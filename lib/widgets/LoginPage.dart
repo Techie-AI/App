@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../pages/dashboard_page.dart';
 import '../widgets/background_wrapper.dart';
 
 class LoginPage extends StatelessWidget {
@@ -27,7 +28,7 @@ class LoginPage extends StatelessWidget {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      TextField(
+                      const TextField(
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: 'Email',
@@ -35,7 +36,7 @@ class LoginPage extends StatelessWidget {
                         keyboardType: TextInputType.emailAddress,
                       ),
                       const SizedBox(height: 16.0),
-                      TextField(
+                      const TextField(
                         decoration: InputDecoration(
                           border: OutlineInputBorder(),
                           labelText: 'Password',
@@ -45,7 +46,15 @@ class LoginPage extends StatelessWidget {
                       const SizedBox(height: 32.0),
                       ElevatedButton(
                         onPressed: () {
-                          // Handle login logic here
+                          // Navigate to DashboardPage with the user's name
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DashboardPage(
+                                  name:
+                                      'User Name'), // Replace with actual user name
+                            ),
+                          );
                         },
                         child: const Text('Login'),
                       ),
