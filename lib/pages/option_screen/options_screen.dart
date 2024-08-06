@@ -26,6 +26,8 @@ class _OptionsScreenState extends State<OptionsScreen> {
   bool isLoading = false;
   String warningMessage = '';
 
+  bool isBudgetHovered = false; // Track hover state for the budget input
+
   bool get isSubmitEnabled {
     final budget = double.tryParse(
         budgetController.text.replaceAll(',', '').replaceAll('₹', '').trim());
@@ -235,42 +237,95 @@ class _OptionsScreenState extends State<OptionsScreen> {
                                     ),
                                   ),
                                   const SizedBox(height: 10),
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Text(
-                                        '₹',
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 24,
-                                        ),
+                                  MouseRegion(
+                                    onEnter: (_) {
+                                      setState(() {
+                                        isBudgetHovered = true; // Set hover state to true
+                                      });
+                                    },
+                                    onExit: (_) {
+                                      setState(() {
+                                        isBudgetHovered = false; // Set hover state to false
+                                      });
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        // gradient: isBudgetHovered
+                                        //     ? LinearGradient(
+                                        //         colors: [
+                                        //           Colors.blue.withOpacity(0.6),
+                                        //           Colors.purple.withOpacity(0.6),
+                                        //         ],
+                                        //         begin: Alignment.topLeft,
+                                        //         end: Alignment.bottomRight,
+                                        //       )
+                                        //     : LinearGradient(
+                                        //         colors: [
+                                        //           Colors.blue.withOpacity(0.6),
+                                        //           Colors.purple.withOpacity(0.6),
+                                        //         ],
+                                        //         begin: Alignment.topLeft,
+                                        //         end: Alignment.bottomRight,
+                                        //       ),
+                                        boxShadow: isBudgetHovered
+                                            ? [
+                                                BoxShadow(
+                                                  color: Colors.blue.withOpacity(0.7),
+                                                  blurRadius: 20, // Increased blur radius for glow effect
+                                                  spreadRadius: 5, // Increased spread radius for a more visible glow
+                                                ),
+                                                BoxShadow(
+                                                  color: Colors.purple.withOpacity(0.7),
+                                                  blurRadius: 20,
+                                                  spreadRadius: 5,
+                                                ),
+                                              ]
+                                            : null,
                                       ),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: TextField(
-                                          controller: budgetController,
-                                          keyboardType: TextInputType.number,
-                                          inputFormatters: [
-                                            FilteringTextInputFormatter
-                                                .digitsOnly,
-                                            CurrencyTextInputFormatter(),
-                                          ],
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                          ),
-                                          onChanged: (value) {
-                                            updateWarningMessage();
-                                          },
-                                          decoration: const InputDecoration(
-                                            border: OutlineInputBorder(),
-                                            hintText: 'Enter your budget',
-                                            hintStyle: TextStyle(
-                                              color: Colors.white70,
+                                      child: Row(
+                                        children: [
+                                          const Padding(
+                                            padding: EdgeInsets.symmetric(horizontal: 8.0),
+                                            child: Text(
+                                              '₹',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 24,
+                                              ),
                                             ),
                                           ),
-                                        ),
+                                          Expanded(
+                                            child: TextField(
+                                              controller: budgetController,
+                                              keyboardType: TextInputType.number,
+                                              inputFormatters: [
+                                                FilteringTextInputFormatter.digitsOnly,
+                                                CurrencyTextInputFormatter(),
+                                              ],
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                              ),
+                                              onChanged: (value) {
+                                                updateWarningMessage();
+                                              },
+                                              decoration: InputDecoration(
+                                                border: OutlineInputBorder(
+                                                  borderRadius: BorderRadius.circular(10),
+                                                  borderSide: BorderSide.none, // Remove the default border
+                                                ),
+                                                hintText: 'Enter your budget',
+                                                hintStyle: const TextStyle(
+                                                  color: Colors.white70,
+                                                ),
+                                                filled: true,
+                                                fillColor: Colors.grey[850],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
-                                    ],
+                                    ),
                                   ),
                                   if (warningMessage.isNotEmpty)
                                     Padding(
