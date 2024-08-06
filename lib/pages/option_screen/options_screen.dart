@@ -33,11 +33,11 @@ class _OptionsScreenState extends State<OptionsScreen> {
       return false;
     }
     switch (selectedPcType) {
-      case 'Gaming PC (High)':
+      case 'Gaming PC\n(High Computation)':
         return budget >= 50000;
-      case 'Office PC (Mid)':
+      case 'Office PC\n(Mid Computation)':
         return budget >= 30000;
-      case 'Personal PC (Low)':
+      case 'Personal PC\n(Low Computation)':
         return budget >= 15000;
       default:
         return false;
@@ -56,15 +56,15 @@ class _OptionsScreenState extends State<OptionsScreen> {
       warningMessage = 'Please enter a valid budget.';
     } else {
       switch (selectedPcType) {
-        case 'Gaming PC (High)':
+        case 'Gaming PC\n(High Computation)':
           warningMessage =
               budget >= 50000 ? '' : 'Minimum budget for Gaming PC is ₹50,000.';
           break;
-        case 'Office PC (Mid)':
+        case 'Office PC\n(Mid Computation)':
           warningMessage =
               budget >= 30000 ? '' : 'Minimum budget for Office PC is ₹30,000.';
           break;
-        case 'Personal PC (Low)':
+        case 'Personal PC\n(Low Computation)':
           warningMessage = budget >= 15000
               ? ''
               : 'Minimum budget for Personal PC is ₹15,000.';
