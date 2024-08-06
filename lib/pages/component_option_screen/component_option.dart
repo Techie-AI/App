@@ -38,10 +38,17 @@ class _ComponentOptionState extends State<ComponentOption> {
         var name = parts[0];
         var priceString = parts[1];
         double price = double.tryParse(priceString) ?? 0.0;
-        String? link = componentData[componentType].firstWhere(
+
+        // Access the options list from the component data
+        List<dynamic> options = componentData[componentType]['options'] ?? [];
+
+        // Find the option where the name matches
+        var option = options.firstWhere(
           (option) => option['name'] == name,
           orElse: () => {},
-        )['link'];
+        );
+
+        String? link = option['link'];
 
         selectedComponents[componentType] = {
           'name': name,
@@ -74,23 +81,24 @@ class _ComponentOptionState extends State<ComponentOption> {
   }
 
   void handleNext() {
+    final importantComponents = [
+      'cpu',
+      'gpu',
+      'motherboard',
+      'memory',
+      'storage'
+    ];
+
     if (showImportant) {
-      // Check if at least one important component is selected
-      final importantComponents = [
-        'cpu',
-        'gpu',
-        'motherboard',
-        'memory',
-        'storage'
-      ];
-      bool hasSelectedImportant = importantComponents.any(
+      // Check if all important components are selected
+      bool allImportantSelected = importantComponents.every(
         (type) => selectedComponents.containsKey(type),
       );
 
-      if (!hasSelectedImportant) {
+      if (!allImportantSelected) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Please select at least one important component'),
+            content: Text('Please select all important components'),
           ),
         );
         return;
@@ -102,6 +110,12 @@ class _ComponentOptionState extends State<ComponentOption> {
     } else {
       navigateToResultPage();
     }
+  }
+
+  void toggleComponentView() {
+    setState(() {
+      showImportant = !showImportant;
+    });
   }
 
   @override
@@ -138,6 +152,16 @@ class _ComponentOptionState extends State<ComponentOption> {
               ],
             ),
             const SizedBox(height: 20),
+            Center(
+              child: Text(
+                showImportant
+                    ? 'Important Components'
+                    : 'Non-Important Components',
+                style:
+                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+            const SizedBox(height: 10),
             Expanded(
               child: componentData.isNotEmpty
                   ? LayoutBuilder(
@@ -154,7 +178,9 @@ class _ComponentOptionState extends State<ComponentOption> {
                             ? importantKeys
                                 .where((key) => keys.contains(key))
                                 .toList()
-                            : keys;
+                            : keys
+                                .where((key) => !importantKeys.contains(key))
+                                .toList();
 
                         if (constraints.maxWidth < 600) {
                           return ListView.builder(
@@ -186,7 +212,7 @@ class _ComponentOptionState extends State<ComponentOption> {
                               return buildOptionCard(
                                 context,
                                 componentType.toUpperCase(),
-                                componentData[componentType] ?? [],
+                                componentData[componentType]['options'] ?? [],
                                 selectedComponents,
                                 (String? value) {
                                   handleComponentSelection(
@@ -201,11 +227,19 @@ class _ComponentOptionState extends State<ComponentOption> {
                   : const Center(child: CircularProgressIndicator()),
             ),
             const SizedBox(height: 20),
-            Center(
-              child: ElevatedButton(
-                onPressed: handleNext,
-                child: Text(showImportant ? 'Next' : 'Get the Result'),
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                ElevatedButton(
+                  onPressed: toggleComponentView,
+                  child: Text(
+                      showImportant ? 'Show Non-Important' : 'Show Important'),
+                ),
+                ElevatedButton(
+                  onPressed: handleNext,
+                  child: Text(showImportant ? 'Next' : 'Get the Result'),
+                ),
+              ],
             ),
           ],
         ),
