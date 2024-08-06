@@ -17,9 +17,9 @@ class OptionsScreen extends StatefulWidget {
 
 class _OptionsScreenState extends State<OptionsScreen> {
   List<PcOption> pcOptions = [
-    PcOption(name: 'Gaming PC (High)', image: 'assets/gaming_pc.png'),
-    PcOption(name: 'Office PC (Mid)', image: 'assets/office_pc.png'),
-    PcOption(name: 'Personal PC (Low)', image: 'assets/personal_pc.png'),
+    PcOption(name: 'Gaming PC\n(High Computation)', image: 'assets/gaming_pc.png'),
+    PcOption(name: 'Office PC\n(Mid Computation)', image: 'assets/office_pc.png'),
+    PcOption(name: 'Personal PC\n(Low Computation)', image: 'assets/personal_pc.png'),
   ];
   String selectedPcType = '';
   TextEditingController budgetController = TextEditingController();
@@ -34,11 +34,11 @@ class _OptionsScreenState extends State<OptionsScreen> {
     }
     switch (selectedPcType) {
       case 'Gaming PC (High)':
-        return budget > 50000;
+        return budget >= 50000;
       case 'Office PC (Mid)':
-        return budget > 30000;
+        return budget >= 30000;
       case 'Personal PC (Low)':
-        return budget > 15000;
+        return budget >= 15000;
       default:
         return false;
     }
@@ -58,14 +58,14 @@ class _OptionsScreenState extends State<OptionsScreen> {
       switch (selectedPcType) {
         case 'Gaming PC (High)':
           warningMessage =
-              budget > 50000 ? '' : 'Minimum budget for Gaming PC is ₹50,000.';
+              budget >= 50000 ? '' : 'Minimum budget for Gaming PC is ₹50,000.';
           break;
         case 'Office PC (Mid)':
           warningMessage =
-              budget > 30000 ? '' : 'Minimum budget for Office PC is ₹30,000.';
+              budget >= 30000 ? '' : 'Minimum budget for Office PC is ₹30,000.';
           break;
         case 'Personal PC (Low)':
-          warningMessage = budget > 15000
+          warningMessage = budget >= 15000
               ? ''
               : 'Minimum budget for Personal PC is ₹15,000.';
           break;
