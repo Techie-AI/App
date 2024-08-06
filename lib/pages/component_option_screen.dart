@@ -8,6 +8,7 @@ class ComponentOption extends StatefulWidget {
   const ComponentOption({super.key, required this.budget, required this.data});
 
   @override
+  // ignore: library_private_types_in_public_api
   _ComponentOptionState createState() => _ComponentOptionState();
 }
 

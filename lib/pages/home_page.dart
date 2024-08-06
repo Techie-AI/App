@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/footer.dart';
-import '../widgets/welcome_text.dart';
-import '../widgets/header.dart';
+import '../widgets/welcome_text.dart'; // Ensure this import matches the path to your AnimatedWelcomeText widget
 import 'options_screen.dart';
 
 class HomePage extends StatelessWidget {
@@ -9,21 +7,29 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Define colors with opacity
+    final List<Color> gradientColors = [
+      const Color(0xFF141821).withOpacity(0.7), // Darkest color with opacity
+      const Color(0xFF1b202c).withOpacity(0.7),
+      const Color(0xFF222937).withOpacity(0.7),
+      const Color(0xFF293243).withOpacity(0.7),
+      const Color(0xFF303b4f).withOpacity(0.7), // Lightest color with opacity
+    ];
+
     return Scaffold(
       body: Stack(
         fit: StackFit.expand,
         children: [
-          // Gradient background
+          // Full-screen image
+          Image.asset(
+            'assets/background.jpg',
+            fit: BoxFit.cover,
+          ),
+          // Gradient overlay
           Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [
-                  Color(0xFFafafaf),
-                  Color(0xFFc2c2c2),
-                  Color(0xFFd6d6d6),
-                  Color(0xFFeaeaea),
-                  Color(0xFFFFFFFF),
-                ],
+                colors: gradientColors,
                 begin: Alignment.bottomCenter,
                 end: Alignment.topCenter,
               ),
@@ -32,18 +38,16 @@ class HomePage extends StatelessWidget {
           // Main content
           Column(
             children: <Widget>[
-              Header(),
-              const Expanded(
+              Expanded(
                 child: Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      AnimatedWelcomeText(),
+                      AnimatedWelcomeText(), // Remove `const` here
                     ],
                   ),
                 ),
               ),
-              const Footer(),
             ],
           ),
           // Positioned button

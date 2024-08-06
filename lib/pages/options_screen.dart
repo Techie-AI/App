@@ -10,6 +10,7 @@ class OptionsScreen extends StatefulWidget {
   const OptionsScreen({super.key});
 
   @override
+  // ignore: library_private_types_in_public_api
   _OptionsScreenState createState() => _OptionsScreenState();
 }
 
@@ -76,7 +77,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
           'Choose Your PC Type',
           style: TextStyle(color: Colors.white), // Set text color to white
         ),
-        backgroundColor: Color.fromARGB(221, 32, 32, 32),
+        backgroundColor: const Color.fromARGB(221, 32, 32, 32),
         foregroundColor: Colors.white, // Set the foreground color for icons and text
       ),
       backgroundColor: Colors.black,
