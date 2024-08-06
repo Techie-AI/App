@@ -1,6 +1,12 @@
+// ignore_for_file: dead_code
+
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'build_option_card.dart';
 import '../result_page/result_page.dart';
+import '../../service/description_provider.dart';
+import 'package:provider/provider.dart';
 
 class ComponentOption extends StatefulWidget {
   final String budget;
@@ -32,40 +38,173 @@ class _ComponentOptionState extends State<ComponentOption> {
   }
 
   void handleComponentSelection(String componentType, String? value) {
-    setState(() {
-      if (value != null) {
-        var parts = value.split(' - ₹');
-        var name = parts[0];
-        var priceString = parts[1];
+    if (value != null) {
+      var parts = value.split(' - ₹');
+      var name = parts[0];
+      var priceString = parts[1];
+      double price = double.tryParse(priceString) ?? 0.0;
+
+      // Access the options list from the component data
+      List<dynamic> options = componentData[componentType]['options'] ?? [];
+
+      // Find the option where the name matches
+      var option = options.firstWhere(
+        (option) => option['name'] == name,
+        orElse: () => {},
+      );
+
+      String? link = option['link'];
+
+      _showConfirmationDialog(componentType, name, priceString, link, price);
+    } else {
+      var removed = selectedComponents.remove(componentType);
+      if (removed != null) {
+        var priceString = removed['price'] ?? '0';
         double price = double.tryParse(priceString) ?? 0.0;
-
-        // Access the options list from the component data
-        List<dynamic> options = componentData[componentType]['options'] ?? [];
-
-        // Find the option where the name matches
-        var option = options.firstWhere(
-          (option) => option['name'] == name,
-          orElse: () => {},
-        );
-
-        String? link = option['link'];
-
-        selectedComponents[componentType] = {
-          'name': name,
-          'price': priceString,
-          'link': link, // Ensure link is set here
-        };
-
-        updateBudget(price, true);
-      } else {
-        var removed = selectedComponents.remove(componentType);
-        if (removed != null) {
-          var priceString = removed['price'] ?? '0';
-          double price = double.tryParse(priceString) ?? 0.0;
-          updateBudget(price, false);
-        }
+        updateBudget(price, false);
       }
-    });
+    }
+  }
+
+  void _showConfirmationDialog(String componentType, String name,
+      String priceString, String? link, double price) async {
+    bool isLoading = true;
+    String description = '';
+    Map<String, String> specs = {};
+
+    // Show the dialog
+    showDialog(
+      context: context,
+      barrierDismissible:
+          false, // Prevent dismissing the dialog by tapping outside
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirm Selection'),
+          content: isLoading
+              ? Center(
+                  child: CircularProgressIndicator()) // Show loading spinner
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Component: $name'),
+                    Text('Price: ₹$priceString'),
+                    if (link != null) ...[
+                      const SizedBox(height: 10),
+                      Text('Link: $link'),
+                    ],
+                    const SizedBox(height: 10),
+                    Text('Description:'),
+                    Text(description),
+                    const SizedBox(height: 10),
+                    Text('Specifications:'),
+                    ...specs.entries
+                        .map((entry) => Text('${entry.key}: ${entry.value}'))
+                        .toList(),
+                  ],
+                ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('Back'),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  selectedComponents[componentType] = {
+                    'name': name,
+                    'price': priceString,
+                    'link': link,
+                  };
+                  updateBudget(price, true);
+                });
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('Confirm'),
+            ),
+          ],
+        );
+      },
+    );
+
+    // Fetch the description and specs
+    final descriptionProvider =
+        Provider.of<DescriptionProvider>(context, listen: false);
+    final response =
+        await descriptionProvider.getComponentDescription(name, priceString);
+
+    // Update the dialog with the description and specs
+    try {
+      // Parse the response
+      final data = jsonDecode(response) as Map<String, dynamic>;
+
+      description = data['description'] ?? '';
+      final specsData = data['specs'];
+
+      if (specsData is Map<String, dynamic>) {
+        specs = Map<String, String>.from(specsData);
+      } else {
+        throw Exception('Invalid specs format');
+      }
+    } catch (e) {
+      print("Error parsing response: $e");
+      description = 'An error occurred while fetching the description.';
+    }
+
+    // Update the dialog with the new data
+    Navigator.of(context).pop(); // Close the existing dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirm Selection'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Component: $name'),
+              Text('Price: ₹$priceString'),
+              if (link != null) ...[
+                const SizedBox(height: 10),
+                Text('Link: $link'),
+              ],
+              const SizedBox(height: 10),
+              Text('Description:'),
+              Text(description),
+              const SizedBox(height: 10),
+              Text('Specifications:'),
+              ...specs.entries
+                  .map((entry) => Text('${entry.key}: ${entry.value}'))
+                  .toList(),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('Back'),
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  selectedComponents[componentType] = {
+                    'name': name,
+                    'price': priceString,
+                    'link': link,
+                  };
+                  updateBudget(price, true);
+                });
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: const Text('Confirm'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void navigateToResultPage() {
