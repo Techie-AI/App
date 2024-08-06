@@ -173,7 +173,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
                                             boxShadow: option.isHovered()
                                                 ? [
                                                     BoxShadow(
-                                                      color: Colors.teal
+                                                      color: Color.fromARGB(255, 0, 150, 136)
                                                           .withOpacity(0.5),
                                                       blurRadius: 8,
                                                       spreadRadius: 2,

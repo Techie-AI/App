@@ -16,11 +16,11 @@ class ComponentsTable extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
-        color: Colors.deepPurple.shade50,
+        color: Color.fromARGB(255, 34, 34, 34),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.5),
+            color: const Color.fromARGB(255, 0, 82, 150).withOpacity(0.5),
             spreadRadius: 2,
             blurRadius: 5,
             offset: const Offset(0, 3),
@@ -35,11 +35,11 @@ class ComponentsTable extends StatelessWidget {
             style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
-                color: Colors.deepPurple),
+                color: Color.fromARGB(255, 0, 122, 223)),
           ),
           const SizedBox(height: 20),
           Table(
-            border: TableBorder.all(color: Colors.deepPurple),
+            border: TableBorder.all(color: const Color.fromARGB(255, 0, 82, 150)),
             columnWidths: screenWidth < 600
                 ? {
                     0: FlexColumnWidth(),
@@ -56,7 +56,7 @@ class ComponentsTable extends StatelessWidget {
             children: [
               const TableRow(
                 decoration: BoxDecoration(
-                  color: Colors.deepPurple,
+                  color: Color.fromARGB(255, 0, 82, 150),
                 ),
                 children: [
                   Padding(

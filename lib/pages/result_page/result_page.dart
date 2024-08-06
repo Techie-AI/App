@@ -44,43 +44,53 @@ class ResultPage extends StatelessWidget {
     double remainingBudget = initialBudget - totalCost;
     final screenWidth = MediaQuery.of(context).size.width;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Selected Components'),
+    return Theme(
+      data: ThemeData.dark().copyWith(
+        colorScheme: ColorScheme.dark(
+          primary: Colors.deepPurple,
+          secondary: Colors.deepPurpleAccent,
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Color.fromARGB(255, 0, 46, 173),
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+            textStyle: const TextStyle(fontSize: 18),
+          ),
+        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ListView(
-          children: [
-            ComponentsTable(
-                selectedComponents: selectedComponents,
-                screenWidth: screenWidth),
-            const SizedBox(height: 20),
-            const InstallationInstructions(),
-            const SizedBox(height: 20),
-            BalanceSheet(
-              totalCost: totalCost,
-              initialBudget: initialBudget,
-              remainingBudget: remainingBudget,
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () async {
-                final pdfData = await generatePdf();
-                await Printing.layoutPdf(
-                  onLayout: (PdfPageFormat format) async => pdfData,
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.deepPurple,
-                foregroundColor: Colors.white,
-                padding:
-                    const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-                textStyle: const TextStyle(fontSize: 18),
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Selected Components'),
+          backgroundColor: Color.fromARGB(255, 0, 27, 68),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: ListView(
+            children: [
+              ComponentsTable(
+                  selectedComponents: selectedComponents,
+                  screenWidth: screenWidth),
+              const SizedBox(height: 20),
+              const InstallationInstructions(),
+              const SizedBox(height: 20),
+              BalanceSheet(
+                totalCost: totalCost,
+                initialBudget: initialBudget,
+                remainingBudget: remainingBudget,
               ),
-              child: const Text('Print Document'),
-            ),
-          ],
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () async {
+                  final pdfData = await generatePdf();
+                  await Printing.layoutPdf(
+                    onLayout: (PdfPageFormat format) async => pdfData,
+                  );
+                },
+                child: const Text('Print Document'),
+              ),
+            ],
+          ),
         ),
       ),
     );
