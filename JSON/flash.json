@@ -1,0 +1,94 @@
+{
+  "components": {
+    "case": {
+      "options": [
+        { "name": "Antec NX410", "price": "₹3,000 - ₹4,000" },
+        { "name": "Corsair 275R Airflow", "price": "₹4,500 - ₹5,500" },
+        { "name": "Cooler Master MasterBox Q300L", "price": "₹3,500 - ₹4,500" }
+      ]
+    },
+    "cpu": {
+      "options": [
+        { "name": "Intel Core i5-12400F", "price": "₹15,000 - ₹17,000" },
+        { "name": "AMD Ryzen 5 5600", "price": "₹16,000 - ₹18,000" },
+        { "name": "Intel Core i3-12100F", "price": "₹10,000 - ₹12,000" }
+      ]
+    },
+    "gpu": {
+      "options": [
+        {
+          "name": "Nvidia GeForce GTX 1660 Super",
+          "price": "₹22,000 - ₹25,000"
+        },
+        { "name": "AMD Radeon RX 6600", "price": "₹25,000 - ₹28,000" },
+        {
+          "name": "Nvidia GeForce GTX 1650 Super",
+          "price": "₹18,000 - ₹21,000"
+        }
+      ]
+    },
+    "motherboard": {
+      "options": [
+        { "name": "Gigabyte B660M DS3H", "price": "₹8,000 - ₹9,000" },
+        { "name": "MSI B550M-A PRO", "price": "₹7,000 - ₹8,000" },
+        { "name": "ASRock B460M-HDV", "price": "₹6,000 - ₹7,000" }
+      ]
+    },
+    "memory": {
+      "options": [
+        {
+          "name": "Corsair Vengeance LPX 16GB (2x8GB) DDR4-3200MHz",
+          "price": "₹5,000 - ₹6,000"
+        },
+        {
+          "name": "Crucial Ballistix 16GB (2x8GB) DDR4-3000MHz",
+          "price": "₹4,500 - ₹5,500"
+        },
+        {
+          "name": "Kingston Fury Beast 16GB (2x8GB) DDR4-3200MHz",
+          "price": "₹4,000 - ₹5,000"
+        }
+      ]
+    },
+    "storage": {
+      "options": [
+        {
+          "name": "Western Digital Blue SN550 1TB NVMe SSD",
+          "price": "₹5,000 - ₹6,000"
+        },
+        {
+          "name": "Samsung 970 EVO Plus 1TB NVMe SSD",
+          "price": "₹7,000 - ₹8,000"
+        },
+        {
+          "name": "Seagate FireCuda 530 1TB NVMe SSD",
+          "price": "₹6,000 - ₹7,000"
+        }
+      ]
+    },
+    "power_supply": {
+      "options": [
+        { "name": "Corsair CX550F RGB", "price": "₹4,000 - ₹5,000" },
+        { "name": "Antec NeoEco 550C", "price": "₹3,500 - ₹4,500" },
+        { "name": "Cooler Master MWE Gold 550", "price": "₹4,500 - ₹5,500" }
+      ]
+    },
+    "system_cooling": {
+      "options": [
+        {
+          "name": "Cooler Master Hyper 212 Black Edition",
+          "price": "₹2,000 - ₹2,500"
+        },
+        { "name": "DeepCool Gammaxx 400 V2", "price": "₹1,500 - ₹2,000" },
+        { "name": "Scythe Mugen 5 Rev. B", "price": "₹2,500 - ₹3,000" }
+      ]
+    },
+    "peripherals": {
+      "options": [
+        { "name": "Logitech G203 LIGHTSYNC", "price": "₹2,500 - ₹3,000" },
+        { "name": "Razer DeathAdder Essential", "price": "₹2,000 - ₹2,500" },
+        { "name": "Redragon M601", "price": "₹1,500 - ₹2,000" }
+      ]
+    }
+  }
+}
