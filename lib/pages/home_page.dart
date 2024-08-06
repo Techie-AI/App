@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/welcome_text.dart'; // Ensure this import matches the path to your AnimatedWelcomeText widget
-import 'options_screen.dart';
+import 'option_screen/options_screen.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
