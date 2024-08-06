@@ -22,6 +22,7 @@ dependencies:
   printing: ^5.10.0
   google_fonts: ^6.2.1
   url_launcher: ^6.0.20
+  google_sign_in: ^5.2.3
 
 dev_dependencies:
   flutter_test:
@@ -50,3 +51,4 @@ flutter:
     - assets/icons/app_icon_48.png
     - assets/icons/app_icon_128.png
     - assets/icons/app_icon_256.png
+    - assets/background.webp

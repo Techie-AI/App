@@ -1,0 +1,37 @@
+{
+  "components": {
+    "case": {
+      "options": [{ "name": "", "price": "" }]
+    },
+    "cpu": {
+      "options": [{ "name": "", "price": "" }]
+    },
+    "gpu": {
+      "options": [{ "name": "", "price": "" }]
+    },
+    "motherboard": {
+      "options": [{ "name": "", "price": "" }]
+    },
+    "memory": {
+      "options": [{ "name": "", "price": "" }]
+    },
+    "storage": {
+      "options": [{ "name": "", "price": "" }]
+    },
+    "power_supply": {
+      "options": [{ "name": "", "price": "" }]
+    },
+    "system_cooling": {
+      "options": [{ "name": "", "price": "" }]
+    },
+    "peripherals": {
+      "options": [{ "name": "", "price": "" }]
+    },
+    "network_card": {
+      "options": [{ "name": "", "price": "" }]
+    },
+    "sound_card": {
+      "options": [{ "name": "", "price": "" }]
+    }
+  }
+}

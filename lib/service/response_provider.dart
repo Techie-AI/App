@@ -37,20 +37,50 @@ class ResponseProvider extends ChangeNotifier {
     final content = [
       Content.text('hey, i want your advice on pc building\n'
           'i want a $pcType but i have $budget budget\n\n'
-          'can you give me multiple options for every component with prices\n'
-          'in only JSON\n\n'
-          'give 3 options for each\n\n'
+          'can you give me multiple options for every component with prices range\n\n'
+          'give multiple options for each component\n\n'
           'JSON Example \n'
-          '"components": {\n'
-          '    "cpu": {},\n'
-          '    "motherboard": {},\n'
-          '    ...\n'
+          '{\n'
+          '  "components": {\n'
+          '    "case": {\n'
+          '      "options": [{ "name": "", "price": "" }]\n'
+          '    },\n'
+          '    "cpu": {\n'
+          '      "options": [{ "name": "", "price": "" }]\n'
+          '    },\n'
+          '    "gpu": {\n'
+          '      "options": [{ "name": "", "price": "" }]\n'
+          '    },\n'
+          '    "motherboard": {\n'
+          '      "options": [{ "name": "", "price": "" }]\n'
+          '    },\n'
+          '    "memory": {\n'
+          '      "options": [{ "name": "", "price": "" }]\n'
+          '    },\n'
+          '    "storage": {\n'
+          '      "options": [{ "name": "", "price": "" }]\n'
+          '    },\n'
+          '    "power_supply": {\n'
+          '      "options": [{ "name": "", "price": "" }]\n'
+          '    },\n'
+          '    "system_cooling": {\n'
+          '      "options": [{ "name": "", "price": "" }]\n'
+          '    },\n'
+          '    "peripherals": {\n'
+          '      "options": [{ "name": "", "price": "" }]\n'
+          '    },\n'
+          '    "network_card": {\n'
+          '      "options": [{ "name": "", "price": "" }]\n'
+          '    },\n'
+          '    "sound_card": {\n'
+          '      "options": [{ "name": "", "price": "" }]\n'
+          '    }\n'
+          '  }\n'
           '}')
     ];
 
     try {
       final response = await _model.generateContent(content);
-
       String? output = response.text;
 
       if (output == null || output.isEmpty) {
@@ -60,16 +90,19 @@ class ResponseProvider extends ChangeNotifier {
 
       final Map<String, dynamic> result = jsonDecode(output);
 
-      // Check the structure of the result and ensure it matches the expected format
       if (result.containsKey('components') && result['components'] is Map) {
         // Add product links
-        result['components'].forEach((component, options) {
-          if (options is List) {
-            for (var option in options) {
-              if (option is Map && option.containsKey('name')) {
-                String productName = option['name'];
-                option['link'] =
-                    "https://www.amazon.in/s?k=${Uri.encodeComponent(productName)}";
+        (result['components'] as Map<String, dynamic>)
+            .forEach((component, optionsMap) {
+          if (optionsMap is Map && optionsMap.containsKey('options')) {
+            var options = optionsMap['options'];
+            if (options is List) {
+              for (var option in options) {
+                if (option is Map && option.containsKey('name')) {
+                  String productName = option['name'];
+                  option['link'] =
+                      "https://www.amazon.in/s?k=${Uri.encodeComponent(productName)}";
+                }
               }
             }
           }
