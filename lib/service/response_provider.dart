@@ -81,7 +81,6 @@ class ResponseProvider extends ChangeNotifier {
 
     try {
       final response = await _model.generateContent(content);
-
       String? output = response.text;
 
       if (output == null || output.isEmpty) {
@@ -91,16 +90,19 @@ class ResponseProvider extends ChangeNotifier {
 
       final Map<String, dynamic> result = jsonDecode(output);
 
-      // Check the structure of the result and ensure it matches the expected format
       if (result.containsKey('components') && result['components'] is Map) {
         // Add product links
-        result['components'].forEach((component, options) {
-          if (options is List) {
-            for (var option in options) {
-              if (option is Map && option.containsKey('name')) {
-                String productName = option['name'];
-                option['link'] =
-                    "https://www.amazon.in/s?k=${Uri.encodeComponent(productName)}";
+        (result['components'] as Map<String, dynamic>)
+            .forEach((component, optionsMap) {
+          if (optionsMap is Map && optionsMap.containsKey('options')) {
+            var options = optionsMap['options'];
+            if (options is List) {
+              for (var option in options) {
+                if (option is Map && option.containsKey('name')) {
+                  String productName = option['name'];
+                  option['link'] =
+                      "https://www.amazon.in/s?k=${Uri.encodeComponent(productName)}";
+                }
               }
             }
           }

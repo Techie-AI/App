@@ -53,7 +53,7 @@ class _ComponentOptionState extends State<ComponentOption> {
         selectedComponents[componentType] = {
           'name': name,
           'price': priceString,
-          'link': link,
+          'link': link, // Ensure link is set here
         };
 
         updateBudget(price, true);
