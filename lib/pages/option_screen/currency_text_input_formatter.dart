@@ -34,6 +34,6 @@ class CurrencyTextInputFormatter extends TextInputFormatter {
       result += valueString[i];
     }
 
-    return '₹$result';
+    return '$result';
   }
 }
