@@ -22,7 +22,7 @@ class HomePage extends StatelessWidget {
         children: [
           // Full-screen image
           Image.asset(
-            'assets/background.jpg',
+            'assets/background.webp',
             fit: BoxFit.cover,
           ),
           // Gradient overlay
