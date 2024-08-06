@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/welcome_text.dart'; // Ensure this import matches the path to your AnimatedWelcomeText widget
-import 'option_screen/options_screen.dart';
+import '../widgets/LoginPage.dart'; // Import the LoginPage
+import '../pages/option_screen/options_screen.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -36,7 +37,7 @@ class HomePage extends StatelessWidget {
             ),
           ),
           // Main content
-          Column(
+          const Column(
             children: <Widget>[
               Expanded(
                 child: Center(
@@ -62,7 +63,8 @@ class HomePage extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const OptionsScreen(),
+                      builder: (context) =>
+                          const LoginPage(), // Navigate to LoginPage
                     ),
                   );
                 },
