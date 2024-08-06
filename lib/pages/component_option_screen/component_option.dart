@@ -68,7 +68,7 @@ class _ComponentOptionState extends State<ComponentOption> {
 
   void _showConfirmationDialog(String componentType, String name,
       String priceString, String? link, double price) async {
-    bool isLoading = true;
+    bool isLoading = true; // Set to true initially while loading
     String description = '';
     Map<String, String> specs = {};
 
@@ -81,8 +81,7 @@ class _ComponentOptionState extends State<ComponentOption> {
         return AlertDialog(
           title: Text('Confirm Selection'),
           content: isLoading
-              ? Center(
-                  child: CircularProgressIndicator()) // Show loading spinner
+              ? Center(child: CircularProgressIndicator()) // Show loading spinner
               : Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -105,13 +104,13 @@ class _ComponentOptionState extends State<ComponentOption> {
                 ),
           actions: [
             TextButton(
-              onPressed: () {
+              onPressed: isLoading ? null : () {
                 Navigator.of(context).pop(); // Close the dialog
               },
               child: const Text('Back'),
             ),
             TextButton(
-              onPressed: () {
+              onPressed: isLoading ? null : () {
                 setState(() {
                   selectedComponents[componentType] = {
                     'name': name,
