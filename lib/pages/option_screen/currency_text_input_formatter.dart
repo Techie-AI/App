@@ -25,15 +25,26 @@ class CurrencyTextInputFormatter extends TextInputFormatter {
 
   String _formatCurrency(int value) {
     String valueString = value.toString();
-    String result = '';
+    int length = valueString.length;
 
-    for (int i = 0; i < valueString.length; i++) {
-      if (i > 0 && (valueString.length - i) % 2 == 0) {
-        result += ',';
+    if (length <= 3) return valueString;
+
+    String result = '';
+    int counter = 0;
+
+    for (int i = length - 1; i >= 0; i--) {
+      result = valueString[i] + result;
+      counter++;
+
+      if (counter == 3 && i != 0) {
+        result = ',' + result;
+        counter = 0;
+      } else if (counter == 2 && i > 1 && (length - i - 1) > 3) {
+        result = ',' + result;
+        counter = 0;
       }
-      result += valueString[i];
     }
 
-    return '$result';
+    return result;
   }
 }
