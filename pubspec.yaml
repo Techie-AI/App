@@ -50,3 +50,4 @@ flutter:
     - assets/icons/app_icon_48.png
     - assets/icons/app_icon_128.png
     - assets/icons/app_icon_256.png
+    - assets/background.jpg
