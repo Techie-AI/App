@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import '../service/login/google_sign_in_provider.dart';
 import '../pages/dashboard_page.dart'; // Import the DashboardPage
 
@@ -28,7 +29,6 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() {
         _user = UserModel.fromMap(userMap);
       });
-      // If user is already signed in, navigate to DashboardPage
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -43,19 +43,22 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _signIn() async {
-    // Mobile sign-in
-    final googleUser = await _googleSignInProvider.signInWithGoogle();
-    if (googleUser != null) {
-      final user = UserModel(
-        displayName: googleUser.displayName ?? '',
-        email: googleUser.email,
-      );
-      await _saveUser(user);
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) => DashboardPage(name: user.displayName)),
-      );
+    if (kIsWeb) {
+      // Handle web-specific sign-in (if needed)
+    } else {
+      final googleUser = await _googleSignInProvider.signInWithGoogle();
+      if (googleUser != null) {
+        final user = UserModel(
+          displayName: googleUser.displayName ?? '',
+          email: googleUser.email,
+        );
+        await _saveUser(user);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => DashboardPage(name: user.displayName)),
+        );
+      }
     }
   }
 

@@ -24,9 +24,8 @@ dependencies:
   url_launcher: ^6.0.20
   google_sign_in: ^5.2.3
   shared_preferences: ^2.0.15
-  googleapis: ^3.0.0
+  googleapis: 13.2.0
   googleapis_auth: ^1.2.0
-  flutter_web_auth: ^0.7.0
 
 dev_dependencies:
   flutter_test:
