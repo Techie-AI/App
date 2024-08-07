@@ -1,11 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../widgets/background_wrapper.dart';
 import '../pages/option_screen/options_screen.dart'; // Import the OptionsScreen
+import '../pages/home_page.dart'; // Import the HomePage
 
 class DashboardPage extends StatelessWidget {
   final String name;
 
   const DashboardPage({required this.name, super.key});
+
+  Future<void> _logout(BuildContext context) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.remove('email');
+    await prefs.remove('name');
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const HomePage()),
+      (route) => false,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,6 +81,11 @@ class DashboardPage extends StatelessWidget {
                           16), // Change the color as needed
                     ),
                     child: const Icon(Icons.add),
+                  ),
+                  const SizedBox(height: 16.0),
+                  ElevatedButton(
+                    onPressed: () => _logout(context),
+                    child: const Text('Logout'),
                   ),
                 ],
               ),
