@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'build_option_card.dart';
 import '../result_page/result_page.dart';
+import '../../service/description_provider.dart';
+import 'package:provider/provider.dart';
 
 class ComponentOption extends StatefulWidget {
   final String budget;
@@ -32,40 +35,194 @@ class _ComponentOptionState extends State<ComponentOption> {
   }
 
   void handleComponentSelection(String componentType, String? value) {
-    setState(() {
-      if (value != null) {
-        var parts = value.split(' - ₹');
-        var name = parts[0];
-        var priceString = parts[1];
+    if (value != null) {
+      var parts = value.split(' - ₹');
+      var name = parts[0];
+      var priceString = parts[1];
+      double price = double.tryParse(priceString) ?? 0.0;
+
+      List<dynamic> options = componentData[componentType]['options'] ?? [];
+      var option = options.firstWhere(
+        (option) => option['name'] == name,
+        orElse: () => {},
+      );
+
+      String? link = option['link'];
+      _showConfirmationDialog(componentType, name, priceString, link, price);
+    } else {
+      var removed = selectedComponents.remove(componentType);
+      if (removed != null) {
+        var priceString = removed['price'] ?? '0';
         double price = double.tryParse(priceString) ?? 0.0;
-
-        // Access the options list from the component data
-        List<dynamic> options = componentData[componentType]['options'] ?? [];
-
-        // Find the option where the name matches
-        var option = options.firstWhere(
-          (option) => option['name'] == name,
-          orElse: () => {},
-        );
-
-        String? link = option['link'];
-
-        selectedComponents[componentType] = {
-          'name': name,
-          'price': priceString,
-          'link': link, // Ensure link is set here
-        };
-
-        updateBudget(price, true);
-      } else {
-        var removed = selectedComponents.remove(componentType);
-        if (removed != null) {
-          var priceString = removed['price'] ?? '0';
-          double price = double.tryParse(priceString) ?? 0.0;
-          updateBudget(price, false);
-        }
+        updateBudget(price, false);
       }
-    });
+    }
+  }
+
+  void _showConfirmationDialog(String componentType, String name,
+      String priceString, String? link, double price) async {
+    bool isLoading = true;
+    String description = '';
+    Map<String, String> specs = {};
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.black, // Set dialog background to black
+          title: const Text('Confirm Selection',
+              style: TextStyle(color: Colors.white)), // Title color
+          content: isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Component: $name',
+                        style: const TextStyle(color: Colors.white)),
+                    Text('Price: ₹$priceString',
+                        style: const TextStyle(color: Colors.white)),
+                    if (link != null) ...[
+                      const SizedBox(height: 10),
+                      Text('Link: $link',
+                          style: const TextStyle(color: Colors.white)),
+                    ],
+                    const SizedBox(height: 10),
+                    const Text('Description:',
+                        style: TextStyle(color: Colors.white)),
+                    Text(description,
+                        style: const TextStyle(color: Colors.white)),
+                    const SizedBox(height: 10),
+                    const Text('Specifications:',
+                        style: TextStyle(color: Colors.white)),
+                    ...specs.entries
+                        .map((entry) => Text('${entry.key}: ${entry.value}',
+                            style: const TextStyle(color: Colors.white)))
+                        .toList(),
+                  ],
+                ),
+          actions: [
+            TextButton(
+              onPressed: isLoading
+                  ? null
+                  : () {
+                      Navigator.of(context).pop();
+                    },
+              child: const Text('Back',
+                  style:
+                      TextStyle(color: Colors.blueAccent)), // Button text color
+            ),
+            TextButton(
+              onPressed: isLoading
+                  ? null
+                  : () {
+                      setState(() {
+                        selectedComponents[componentType] = {
+                          'name': name,
+                          'price': priceString,
+                          'link': link,
+                          'description': description,
+                          'specs':
+                              jsonEncode(specs), // Store specs as JSON string
+                        };
+                        updateBudget(price, true);
+                      });
+                      Navigator.of(context).pop();
+                    },
+              child: const Text('Confirm',
+                  style:
+                      TextStyle(color: Colors.blueAccent)), // Button text color
+            ),
+          ],
+        );
+      },
+    );
+
+    final descriptionProvider =
+        Provider.of<DescriptionProvider>(context, listen: false);
+    final response =
+        await descriptionProvider.getComponentDescription(name, priceString);
+
+    try {
+      final data = jsonDecode(response) as Map<String, dynamic>;
+      description = data['description'] ?? '';
+      final specsData = data['specs'];
+
+      if (specsData is Map<String, dynamic>) {
+        specs = Map<String, String>.from(specsData);
+      } else {
+        throw Exception('Invalid specs format');
+      }
+    } catch (e) {
+      print("Error parsing response: $e");
+      description = 'An error occurred while fetching the description.';
+    }
+
+    Navigator.of(context).pop();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.black, // Set dialog background to black
+          title: const Text('Confirm Selection',
+              style: TextStyle(color: Colors.white)), // Title color
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Component: $name',
+                  style: const TextStyle(color: Colors.white)),
+              Text('Price: $priceString',
+                  style: const TextStyle(color: Colors.white)),
+              if (link != null) ...[
+                const SizedBox(height: 10),
+                Text('Link: $link',
+                    style: const TextStyle(color: Colors.white)),
+              ],
+              const SizedBox(height: 10),
+              const Text('Description:', style: TextStyle(color: Colors.white)),
+              Text(description, style: const TextStyle(color: Colors.white)),
+              const SizedBox(height: 10),
+              const Text('Specifications:',
+                  style: TextStyle(color: Colors.white)),
+              ...specs.entries
+                  .map((entry) => Text('${entry.key}: ${entry.value}',
+                      style: const TextStyle(color: Colors.white)))
+                  .toList(),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('Back',
+                  style:
+                      TextStyle(color: Colors.blueAccent)), // Button text color
+            ),
+            TextButton(
+              onPressed: () {
+                setState(() {
+                  selectedComponents[componentType] = {
+                    'name': name,
+                    'price': priceString,
+                    'link': link,
+                    'description': description,
+                    'specs': jsonEncode(specs), // Store specs as JSON string
+                  };
+                  updateBudget(price, true);
+                });
+                Navigator.of(context).pop();
+              },
+              child: const Text('Confirm',
+                  style:
+                      TextStyle(color: Colors.blueAccent)), // Button text color
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void navigateToResultPage() {
@@ -90,7 +247,6 @@ class _ComponentOptionState extends State<ComponentOption> {
     ];
 
     if (showImportant) {
-      // Check if all important components are selected
       bool allImportantSelected = importantComponents.every(
         (type) => selectedComponents.containsKey(type),
       );
@@ -122,7 +278,10 @@ class _ComponentOptionState extends State<ComponentOption> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Budget Results'),
+        title: const Text('Budget Results',
+            style: TextStyle(color: Color.fromARGB(255, 255, 255, 255))),
+        backgroundColor: const Color.fromARGB(255, 9, 19, 104),
+        // AppBar background
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -135,7 +294,10 @@ class _ComponentOptionState extends State<ComponentOption> {
                 const Expanded(
                   child: Text(
                     'Based on your budget, here are some recommendations:',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white), // Text color
                   ),
                 ),
                 Container(
@@ -157,8 +319,10 @@ class _ComponentOptionState extends State<ComponentOption> {
                 showImportant
                     ? 'Important Components'
                     : 'Non-Important Components',
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white), // Text color
               ),
             ),
             const SizedBox(height: 10),
@@ -244,6 +408,7 @@ class _ComponentOptionState extends State<ComponentOption> {
           ],
         ),
       ),
+      backgroundColor: Colors.black, // Scaffold background
     );
   }
 }
