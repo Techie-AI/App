@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace = "com.techie-ai.app"
+    namespace = "com.example.techie_ai"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -34,7 +34,10 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.techie-ai.app"
+        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
+        applicationId = "com.example.techie_ai"
+        // You can update the following values to match your application needs.
+        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutterVersionCode.toInteger()
@@ -43,14 +46,10 @@ android {
 
     buildTypes {
         release {
+            // TODO: Add your own signing config for the release build.
+            // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.debug
         }
-    }
-    
-    // Add this block to include dependencies
-    dependencies {
-        implementation 'com.google.android.gms:play-services-auth:20.0.0' // Check for the latest version
-        // Add other dependencies here
     }
 }
 
