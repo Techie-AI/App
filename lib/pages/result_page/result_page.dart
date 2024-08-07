@@ -3,8 +3,9 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
-import 'database_helper.dart'; // Adjust the import based on your project's structure
-import 'pdf_generator.dart'; // Adjust the import based on your project's structure
+import 'package:intl/intl.dart';
+import 'database_helper.dart';
+import 'pdf_generator.dart';
 import 'components_table.dart';
 import 'installation_instructions.dart';
 import 'balance_sheet.dart';
@@ -41,6 +42,15 @@ class ResultPage extends StatelessWidget {
     );
   }
 
+  Future<void> saveResult() async {
+    final date = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    final data = jsonEncode({
+      'selectedComponents': selectedComponents,
+      'initialBudget': initialBudget,
+    });
+    await DatabaseHelper().saveResult(date, data);
+  }
+
   @override
   Widget build(BuildContext context) {
     double totalCost = calculateTotalCost();
@@ -73,12 +83,11 @@ class ResultPage extends StatelessWidget {
             children: [
               ComponentsTable(
                 selectedComponents: selectedComponents,
-                screenWidth: screenWidth,
+                screenWidth: screenWidth, // Pass screenWidth here
               ),
               const SizedBox(height: 20),
               const InstallationInstructions(),
               const SizedBox(height: 20),
-              // New section for component descriptions and specs
               if (selectedComponents.isNotEmpty)
                 Container(
                   padding: const EdgeInsets.all(16.0),
@@ -160,14 +169,39 @@ class ResultPage extends StatelessWidget {
                 remainingBudget: remainingBudget,
               ),
               const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () async {
-                  final pdfData = await generatePdf();
-                  await Printing.layoutPdf(
-                    onLayout: (PdfPageFormat format) async => pdfData,
-                  );
-                },
-                child: const Text('Print Document'),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          final pdfData = await generatePdf();
+                          await Printing.layoutPdf(
+                            onLayout: (PdfPageFormat format) async => pdfData,
+                          );
+                        },
+                        child: const Text('Print Document'),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          await saveResult();
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                                content: Text('Result saved successfully!')),
+                          );
+                        },
+                        child: const Text('Save'),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

@@ -39,7 +39,8 @@ class ComponentsTable extends StatelessWidget {
           ),
           const SizedBox(height: 20),
           Table(
-            border: TableBorder.all(color: const Color.fromARGB(255, 0, 82, 150)),
+            border:
+                TableBorder.all(color: const Color.fromARGB(255, 0, 82, 150)),
             columnWidths: screenWidth < 600
                 ? {
                     0: FlexColumnWidth(),
