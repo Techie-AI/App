@@ -36,7 +36,7 @@ class ResponseProvider extends ChangeNotifier {
 
     final content = [
       Content.text('hey, i want your advice on pc building\n'
-          'i want a $pcType but i have $budget budget\n\n'
+          'i want a $pcType but i have $budget INR budget\n\n'
           'can you give me multiple options for every component with prices range\n\n'
           'give multiple options for each component\n\n'
           'JSON Example \n'
