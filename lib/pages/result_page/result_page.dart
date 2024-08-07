@@ -1,13 +1,13 @@
-// ignore_for_file: deprecated_member_use
-
+import 'dart:convert';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
 import 'package:printing/printing.dart';
-import 'dart:typed_data';
+import 'database_helper.dart'; // Adjust the import based on your project's structure
+import 'pdf_generator.dart'; // Adjust the import based on your project's structure
 import 'components_table.dart';
 import 'installation_instructions.dart';
 import 'balance_sheet.dart';
-import 'pdf_generator.dart';
 
 class ResultPage extends StatelessWidget {
   final Map<String, Map<String, String?>> selectedComponents;
@@ -35,7 +35,10 @@ class ResultPage extends StatelessWidget {
   Future<Uint8List> generatePdf() async {
     double totalCost = calculateTotalCost();
     return PdfGenerator.generatePdf(
-        selectedComponents, initialBudget, totalCost);
+      selectedComponents,
+      initialBudget,
+      totalCost,
+    );
   }
 
   @override
@@ -69,10 +72,87 @@ class ResultPage extends StatelessWidget {
           child: ListView(
             children: [
               ComponentsTable(
-                  selectedComponents: selectedComponents,
-                  screenWidth: screenWidth),
+                selectedComponents: selectedComponents,
+                screenWidth: screenWidth,
+              ),
               const SizedBox(height: 20),
               const InstallationInstructions(),
+              const SizedBox(height: 20),
+              // New section for component descriptions and specs
+              if (selectedComponents.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.all(16.0),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[900],
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Component Details',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      ...selectedComponents.entries.map((entry) {
+                        final componentType = entry.key;
+                        final details = entry.value;
+                        final name = details['name'] ?? 'N/A';
+                        final price = details['price'] ?? 'N/A';
+                        final description = details['description'] ??
+                            'No description available';
+                        final specsString = details['specs'] ?? '{}';
+                        final specs =
+                            jsonDecode(specsString) as Map<String, dynamic>;
+
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                '$componentType: $name',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              Text(
+                                'Price: $price',
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                              Text(
+                                'Description: $description',
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                              const SizedBox(height: 10),
+                              const Text(
+                                'Specifications:',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              ...specs.entries
+                                  .map((entry) => Text(
+                                      '${entry.key}: ${entry.value}',
+                                      style:
+                                          const TextStyle(color: Colors.white)))
+                                  .toList(),
+                              const SizedBox(height: 10),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ],
+                  ),
+                ),
               const SizedBox(height: 20),
               BalanceSheet(
                 totalCost: totalCost,
