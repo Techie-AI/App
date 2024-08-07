@@ -12,6 +12,7 @@ Widget buildOptionCard(
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(10),
     ),
+    color: Colors.grey[850], // Dark card background color
     child: Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -19,7 +20,11 @@ Widget buildOptionCard(
         children: [
           Text(
             title,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.white, // Title text color
+            ),
           ),
           const SizedBox(height: 10),
           Column(
@@ -36,16 +41,16 @@ Widget buildOptionCard(
                   padding: const EdgeInsets.all(8.0),
                   margin: const EdgeInsets.symmetric(vertical: 4.0),
                   decoration: BoxDecoration(
-                    color: isSelected ? Colors.blueAccent : Colors.white,
+                    color: isSelected ? Colors.blueAccent : Color.fromARGB(255, 34, 34, 34), // Selected color
                     borderRadius: BorderRadius.circular(8.0),
                     border: Border.all(
-                      color: isSelected ? Colors.blueAccent : Colors.grey,
+                      color: isSelected ? Colors.blueAccent : Colors.grey, // Border color
                     ),
                   ),
                   child: Text(
                     value,
                     style: TextStyle(
-                      color: isSelected ? Colors.white : Colors.black,
+                      color: isSelected ? Colors.white : Color.fromARGB(225, 255, 255, 255), // Text color
                     ),
                   ),
                 ),

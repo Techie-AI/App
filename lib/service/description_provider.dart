@@ -35,7 +35,14 @@ class DescriptionProvider extends ChangeNotifier {
     final content = [
       Content.text(
           'give the description of this component with specs In detail\n\n'
-          '{ "name": "$name", "price": "$price" }')
+          '{ "name": "$name", "price": "$price" }\n\n'
+          'format\n'
+          '{\n'
+          '  "name": "",\n'
+          '  "description": "",\n'
+          '  "specs": {},\n'
+          '  "price": ""\n'
+          '}')
     ];
 
     try {

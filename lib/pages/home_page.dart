@@ -1,9 +1,33 @@
 import 'package:flutter/material.dart';
-import '../widgets/welcome_text.dart'; // Ensure this import matches the path to your AnimatedWelcomeText widget
-import 'options_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../widgets/welcome_text.dart';
+import '../pages/dashboard_page.dart';
+import '../widgets/LoginPage.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
+
+  Future<void> _navigateBasedOnLoginStatus(BuildContext context) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String? email = prefs.getString('email');
+    final String? name = prefs.getString('name');
+
+    if (email != null && name != null) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DashboardPage(name: name),
+        ),
+      );
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const LoginPage(),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,14 +60,14 @@ class HomePage extends StatelessWidget {
             ),
           ),
           // Main content
-          Column(
+          const Column(
             children: <Widget>[
               Expanded(
                 child: Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
-                      AnimatedWelcomeText(), // Remove `const` here
+                      AnimatedWelcomeText(),
                     ],
                   ),
                 ),
@@ -58,14 +82,7 @@ class HomePage extends StatelessWidget {
             right: 0,
             child: Center(
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const OptionsScreen(),
-                    ),
-                  );
-                },
+                onPressed: () => _navigateBasedOnLoginStatus(context),
                 child: const Text('Get Started'),
               ),
             ),
