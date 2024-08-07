@@ -1,10 +1,45 @@
 import 'package:flutter/material.dart';
 import '../widgets/welcome_text.dart'; // Ensure this import matches the path to your AnimatedWelcomeText widget
-import '../widgets/LoginPage.dart'; // Import the LoginPage
-import '../pages/option_screen/options_screen.dart';
+import '../widgets/LoginPage.dart'; // Import the LoginScreen
+import 'dashboard_page.dart'; // Import the DashboardPage
+import '../service/login/google_sign_in_provider.dart'; // Import the GoogleSignInProvider
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  final GoogleSignInProvider _googleSignInProvider = GoogleSignInProvider();
+  UserModel? _user;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUser();
+  }
+
+  Future<void> _loadUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? userData = prefs.getString('user');
+    if (userData != null) {
+      Map<String, dynamic> userMap =
+          Map<String, dynamic>.from(json.decode(userData));
+      setState(() {
+        _user = UserModel.fromMap(userMap);
+      });
+      // If user is already signed in, navigate to DashboardPage
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => DashboardPage(name: _user!.displayName)),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -59,14 +94,26 @@ class HomePage extends StatelessWidget {
             right: 0,
             child: Center(
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
+                onPressed: () async {
+                  final googleUser = await Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) =>
-                          const LoginPage(), // Navigate to LoginPage
+                      builder: (context) => LoginScreen(),
                     ),
                   );
+                  if (googleUser != null) {
+                    final user = UserModel(
+                      displayName: googleUser.displayName ?? '',
+                      email: googleUser.email,
+                    );
+                    await _saveUser(user);
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              DashboardPage(name: user.displayName)),
+                    );
+                  }
                 },
                 child: const Text('Get Started'),
               ),
@@ -75,5 +122,10 @@ class HomePage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<void> _saveUser(UserModel user) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('user', json.encode(user.toMap()));
   }
 }
