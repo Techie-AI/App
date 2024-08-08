@@ -1,10 +1,12 @@
-// ignore_for_file: dead_code
+// component_option.dart
 
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'build_option_card.dart';
 import '../result_page/result_page.dart';
 import '../../service/description_provider.dart';
+import 'component_selection_dialog.dart';
+import 'component_view.dart';
+import 'component_option_buttons.dart';
 import 'package:provider/provider.dart';
 
 class ComponentOption extends StatefulWidget {
@@ -50,7 +52,8 @@ class _ComponentOptionState extends State<ComponentOption> {
       );
 
       String? link = option['link'];
-      _showConfirmationDialog(componentType, name, priceString, link, price);
+      _showComponentSelectionDialog(
+          componentType, name, priceString, link, price);
     } else {
       var removed = selectedComponents.remove(componentType);
       if (removed != null) {
@@ -61,174 +64,63 @@ class _ComponentOptionState extends State<ComponentOption> {
     }
   }
 
- void _showConfirmationDialog(String componentType, String name,
-    String priceString, String? link, double price) async {
-  bool isLoading = true;
-  String description = '';
-  Map<String, String> specs = {};
+  void _showComponentSelectionDialog(String componentType, String name,
+      String priceString, String? link, double price) async {
+    final descriptionProvider =
+        Provider.of<DescriptionProvider>(context, listen: false);
+    final response =
+        await descriptionProvider.getComponentDescription(name, priceString);
 
-  showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        backgroundColor: Colors.black, // Set dialog background to black
-        title: const Text('Confirm Selection',
-            style: TextStyle(color: Colors.white)), // Title color
-        content: isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : SingleChildScrollView( // Make the content scrollable
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Component: $name',
-                        style: const TextStyle(color: Colors.white)),
-                    Text('Price: ₹$priceString',
-                        style: const TextStyle(color: Colors.white)),
-                    if (link != null) ...[
-                      const SizedBox(height: 10),
-                      Text('Link: $link',
-                          style: const TextStyle(color: Colors.white)),
-                    ],
-                    const SizedBox(height: 10),
-                    const Text('Description:',
-                        style: TextStyle(color: Colors.white)),
-                    Text(description,
-                        style: const TextStyle(color: Colors.white)),
-                    const SizedBox(height: 10),
-                    const Text('Specifications:',
-                        style: TextStyle(color: Colors.white)),
-                    ...specs.entries.map((entry) => Text(
-                        '${entry.key}: ${entry.value}',
-                        style: const TextStyle(color: Colors.white))),
-                  ],
-                ),
-              ),
-        actions: [
-          TextButton(
-            onPressed: isLoading
-                ? null
-                : () {
-                    Navigator.of(context).pop();
-                  },
-            child: const Text('Back',
-                style:
-                    TextStyle(color: Colors.blueAccent)), // Button text color
-          ),
-          TextButton(
-            onPressed: isLoading
-                ? null
-                : () {
-                    setState(() {
-                      selectedComponents[componentType] = {
-                        'name': name,
-                        'price': priceString,
-                        'link': link,
-                        'description': description,
-                        'specs':
-                            jsonEncode(specs), // Store specs as JSON string
-                      };
-                      updateBudget(price, true);
-                    });
-                    Navigator.of(context).pop();
-                  },
-            child: const Text('Confirm',
-                style:
-                    TextStyle(color: Colors.blueAccent)), // Button text color
-          ),
-        ],
-      );
-    },
-  );
+    // Handle the dialog content and state
+    final dialogContent =
+        await getDialogContent(response, name, priceString, link);
 
-  final descriptionProvider =
-      Provider.of<DescriptionProvider>(context, listen: false);
-  final response =
-      await descriptionProvider.getComponentDescription(name, priceString);
-
-  try {
-    final data = jsonDecode(response) as Map<String, dynamic>;
-    description = data['description'] ?? '';
-    final specsData = data['specs'];
-
-    if (specsData is Map<String, dynamic>) {
-      specs = Map<String, String>.from(specsData);
-    } else {
-      throw Exception('Invalid specs format');
-    }
-  } catch (e) {
-    print("Error parsing response: $e");
-    description = 'An error occurred while fetching the description.';
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return ComponentSelectionDialog(
+          name: name,
+          priceString: priceString,
+          link: link,
+          description: dialogContent['description'] ?? '',
+          specs: dialogContent['specs'] ?? {},
+          onConfirm: () {
+            setState(() {
+              selectedComponents[componentType] = {
+                'name': name,
+                'price': priceString,
+                'link': link,
+                'description': dialogContent['description'] ?? '',
+                'specs': jsonEncode(dialogContent['specs'] ?? {}),
+              };
+              updateBudget(price, true);
+            });
+            Navigator.of(context).pop();
+          },
+        );
+      },
+    );
   }
 
-  Navigator.of(context).pop();
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        backgroundColor: Colors.black, // Set dialog background to black
-        title: const Text('Confirm Selection',
-            style: TextStyle(color: Colors.white)), // Title color
-        content: SingleChildScrollView( // Make the content scrollable
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Component: $name',
-                  style: const TextStyle(color: Colors.white)),
-              Text('Price: $priceString',
-                  style: const TextStyle(color: Colors.white)),
-              if (link != null) ...[
-                const SizedBox(height: 10),
-                Text('Link: $link',
-                    style: const TextStyle(color: Colors.white)),
-              ],
-              const SizedBox(height: 10),
-              const Text('Description:', style: TextStyle(color: Colors.white)),
-              Text(description, style: const TextStyle(color: Colors.white)),
-              const SizedBox(height: 10),
-              const Text('Specifications:',
-                  style: TextStyle(color: Colors.white)),
-              ...specs.entries
-                  .map((entry) => Text('${entry.key}: ${entry.value}',
-                      style: const TextStyle(color: Colors.white)))
-                  .toList(),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text('Back',
-                style:
-                    TextStyle(color: Colors.blueAccent)), // Button text color
-          ),
-          TextButton(
-            onPressed: () {
-              setState(() {
-                selectedComponents[componentType] = {
-                  'name': name,
-                  'price': priceString,
-                  'link': link,
-                  'description': description,
-                  'specs': jsonEncode(specs), // Store specs as JSON string
-                };
-                updateBudget(price, true);
-              });
-              Navigator.of(context).pop();
-            },
-            child: const Text('Confirm',
-                style:
-                    TextStyle(color: Colors.blueAccent)), // Button text color
-          ),
-        ],
-      );
-    },
-  );
-}
+  Future<Map<String, dynamic>> getDialogContent(
+      String response, String name, String priceString, String? link) async {
+    Map<String, dynamic> dialogContent = {};
+    try {
+      final data = jsonDecode(response) as Map<String, dynamic>;
+      dialogContent['description'] = data['description'] ?? '';
+      final specsData = data['specs'];
+      if (specsData is Map<String, dynamic>) {
+        dialogContent['specs'] = Map<String, String>.from(specsData);
+      } else {
+        throw Exception('Invalid specs format');
+      }
+    } catch (e) {
+      print("Error parsing response: $e");
+      dialogContent['description'] =
+          'An error occurred while fetching the description.';
+    }
+    return dialogContent;
+  }
 
   void navigateToResultPage() {
     Navigator.push(
@@ -283,11 +175,9 @@ class _ComponentOptionState extends State<ComponentOption> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Budget Results',
-            style: TextStyle(color: Color.fromARGB(255, 255, 255, 255))),
-        backgroundColor: const Color.fromARGB(255, 9, 19, 104),
-        // AppBar background
-      ),
+          title: const Text('Budget Results'),
+          backgroundColor: Color.fromARGB(255, 29, 30, 32),
+          foregroundColor: Color.fromARGB(255, 236, 242, 255)),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -300,20 +190,10 @@ class _ComponentOptionState extends State<ComponentOption> {
                   child: Text(
                     'Based on your budget, here are some recommendations:',
                     style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white), // Text color
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(8.0),
-                  decoration: BoxDecoration(
-                    color: Colors.blueAccent,
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: Text(
-                    'Budget: ₹${currentBudget.toStringAsFixed(2)}',
-                    style: const TextStyle(fontSize: 16, color: Colors.white),
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
                   ),
                 ),
               ],
@@ -325,95 +205,31 @@ class _ComponentOptionState extends State<ComponentOption> {
                     ? 'Important Components'
                     : 'Non-Important Components',
                 style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white), // Text color
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
               ),
             ),
             const SizedBox(height: 10),
             Expanded(
-              child: componentData.isNotEmpty
-                  ? LayoutBuilder(
-                      builder: (context, constraints) {
-                        final keys = componentData.keys.toList();
-                        final importantKeys = [
-                          'cpu',
-                          'gpu',
-                          'motherboard',
-                          'memory',
-                          'storage'
-                        ];
-                        final displayedKeys = showImportant
-                            ? importantKeys
-                                .where((key) => keys.contains(key))
-                                .toList()
-                            : keys
-                                .where((key) => !importantKeys.contains(key))
-                                .toList();
-
-                        if (constraints.maxWidth < 600) {
-                          return ListView.builder(
-                            itemCount: displayedKeys.length,
-                            itemBuilder: (context, index) {
-                              String componentType = displayedKeys[index];
-                              return buildOptionCard(
-                                context,
-                                componentType.toUpperCase(),
-                                componentData[componentType]['options'] ?? [],
-                                selectedComponents,
-                                (String? value) {
-                                  handleComponentSelection(
-                                      componentType, value);
-                                },
-                              );
-                            },
-                          );
-                        } else {
-                          return GridView.builder(
-                            gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
-                              childAspectRatio: 3,
-                            ),
-                            itemCount: displayedKeys.length,
-                            itemBuilder: (context, index) {
-                              String componentType = displayedKeys[index];
-                              return buildOptionCard(
-                                context,
-                                componentType.toUpperCase(),
-                                componentData[componentType]['options'] ?? [],
-                                selectedComponents,
-                                (String? value) {
-                                  handleComponentSelection(
-                                      componentType, value);
-                                },
-                              );
-                            },
-                          );
-                        }
-                      },
-                    )
-                  : const Center(child: CircularProgressIndicator()),
+              child: ComponentView(
+                componentData: componentData,
+                showImportant: showImportant,
+                selectedComponents: selectedComponents,
+                onComponentSelection: handleComponentSelection,
+              ),
             ),
             const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                ElevatedButton(
-                  onPressed: toggleComponentView,
-                  child: Text(
-                      showImportant ? 'Show Non-Important' : 'Show Important'),
-                ),
-                ElevatedButton(
-                  onPressed: handleNext,
-                  child: Text(showImportant ? 'Next' : 'Get the Result'),
-                ),
-              ],
+            ComponentOptionButtons(
+              showImportant: showImportant,
+              onToggle: toggleComponentView,
+              onNext: handleNext,
             ),
           ],
         ),
       ),
-      backgroundColor: Colors.black, // Scaffold background
+      backgroundColor: Colors.black,
     );
   }
 }
