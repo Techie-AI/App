@@ -4,16 +4,14 @@ import 'package:techie_ai/service/response_provider.dart';
 import 'package:techie_ai/service/description_provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'pages/home_page.dart';
-import 'package:sqflite/sqflite.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import './pages/database_initializer.dart'; // Import the new file
 
 Future<void> main() async {
   // Initialize environment variables
   await dotenv.load(fileName: ".env");
 
-  // Initialize sqflite_ffi
-  sqfliteFfiInit();
-  databaseFactory = databaseFactoryFfi;
+  // Initialize the database and ensure the results table is created
+  await DatabaseInitializer.initializeDatabase();
 
   // Run the app
   runApp(

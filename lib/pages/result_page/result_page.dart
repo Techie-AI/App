@@ -159,7 +159,7 @@ class ResultPage extends StatelessWidget {
               const SizedBox(height: 20),
               const InstallationInstructions(),
               const SizedBox(height: 20),
-              if (components!.isNotEmpty)
+              if (components.isNotEmpty)
                 Container(
                   padding: const EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
