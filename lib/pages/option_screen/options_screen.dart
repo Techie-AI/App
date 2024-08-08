@@ -123,94 +123,31 @@ class _OptionsScreenState extends State<OptionsScreen> {
                                 ),
                               ),
                               const SizedBox(height: 16),
-                              SizedBox(
-                                width: width,
-                                child: GridView.builder(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  gridDelegate:
-                                      const SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 3,
-                                    childAspectRatio: 1,
-                                    crossAxisSpacing: 10,
-                                    mainAxisSpacing: 10,
-                                  ),
-                                  itemCount: pcOptions.length,
-                                  itemBuilder: (context, index) {
-                                    final option = pcOptions[index];
-                                    return MouseRegion(
-                                      onEnter: (_) {
-                                        setState(() {
-                                          option.setHovered(true);
-                                        });
-                                      },
-                                      onExit: (_) {
-                                        setState(() {
-                                          option.setHovered(false);
-                                        });
-                                      },
-                                      child: GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            selectedPcType = option.name;
-                                            updateWarningMessage();
-                                          });
-                                        },
-                                        child: AnimatedContainer(
-                                          duration:
-                                              const Duration(milliseconds: 200),
-                                          curve: Curves.easeInOut,
-                                          decoration: BoxDecoration(
-                                            color: selectedPcType == option.name
-                                                ? Color.fromARGB(
-                                                        255, 0, 90, 226)
-                                                    .withOpacity(0.3)
-                                                : option.isHovered()
-                                                    ? Colors.grey[700]
-                                                    : Colors.grey[800],
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                            boxShadow: option.isHovered()
-                                                ? [
-                                                    BoxShadow(
-                                                      color: Color.fromARGB(255, 0, 150, 136)
-                                                          .withOpacity(0.5),
-                                                      blurRadius: 8,
-                                                      spreadRadius: 2,
-                                                    ),
-                                                  ]
-                                                : null,
-                                          ),
-                                          child: Card(
-                                            elevation: 4,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                            ),
-                                            color: Colors.transparent,
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Image.asset(option.image,
-                                                    height: 90),
-                                                const SizedBox(height: 10),
-                                                Text(
-                                                  option.name,
-                                                  textAlign: TextAlign.center,
-                                                  style: const TextStyle(
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
+                              // Use GridView for larger screens
+                              width < 600
+                                  ? SingleChildScrollView(
+                                      scrollDirection: Axis.horizontal,
+                                      child: Row(
+                                        children: pcOptions.map((option) {
+                                          return _buildPcOptionCard(option);
+                                        }).toList(),
                                       ),
-                                    );
-                                  },
-                                ),
-                              ),
+                                    )
+                                  : GridView.builder(
+                                      shrinkWrap: true,
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      gridDelegate:
+                                          const SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 3,
+                                        childAspectRatio: 1,
+                                        crossAxisSpacing: 10,
+                                        mainAxisSpacing: 10,
+                                      ),
+                                      itemCount: pcOptions.length,
+                                      itemBuilder: (context, index) {
+                                        return _buildPcOptionCard(pcOptions[index]);
+                                      },
+                                    ),
                             ],
                           ),
                         ),
@@ -251,29 +188,12 @@ class _OptionsScreenState extends State<OptionsScreen> {
                                     child: Container(
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(10),
-                                        // gradient: isBudgetHovered
-                                        //     ? LinearGradient(
-                                        //         colors: [
-                                        //           Colors.blue.withOpacity(0.6),
-                                        //           Colors.purple.withOpacity(0.6),
-                                        //         ],
-                                        //         begin: Alignment.topLeft,
-                                        //         end: Alignment.bottomRight,
-                                        //       )
-                                        //     : LinearGradient(
-                                        //         colors: [
-                                        //           Colors.blue.withOpacity(0.6),
-                                        //           Colors.purple.withOpacity(0.6),
-                                        //         ],
-                                        //         begin: Alignment.topLeft,
-                                        //         end: Alignment.bottomRight,
-                                        //       ),
                                         boxShadow: isBudgetHovered
                                             ? [
                                                 BoxShadow(
                                                   color: Colors.blue.withOpacity(0.7),
-                                                  blurRadius: 20, // Increased blur radius for glow effect
-                                                  spreadRadius: 5, // Increased spread radius for a more visible glow
+                                                  blurRadius: 20,
+                                                  spreadRadius: 5,
                                                 ),
                                                 BoxShadow(
                                                   color: Colors.purple.withOpacity(0.7),
@@ -379,19 +299,81 @@ class _OptionsScreenState extends State<OptionsScreen> {
     );
   }
 
+  Widget _buildPcOptionCard(PcOption option) {
+    return MouseRegion(
+      onEnter: (_) {
+        setState(() {
+          option.setHovered(true);
+        });
+      },
+      onExit: (_) {
+        setState(() {
+          option.setHovered(false);
+        });
+      },
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            selectedPcType = option.name;
+            updateWarningMessage();
+          });
+        },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeInOut,
+          decoration: BoxDecoration(
+            color: selectedPcType == option.name
+                ? Color.fromARGB(255, 0, 90, 226).withOpacity(0.3)
+                : option.isHovered()
+                    ? Colors.grey[700]
+                    : Colors.grey[800],
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: option.isHovered()
+                ? [
+                    BoxShadow(
+                      color: Color.fromARGB(255, 0, 150, 136).withOpacity(0.5),
+                      blurRadius: 8,
+                      spreadRadius: 2,
+                    ),
+                  ]
+                : null,
+          ),
+          child: Card(
+            elevation: 4,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            color: Colors.transparent,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(option.image, height: 90, fit: BoxFit.contain),
+                const SizedBox(height: 10),
+                Text(
+                  option.name,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   void _submit() async {
-    final responseProvider =
-        Provider.of<ResponseProvider>(context, listen: false);
-    final budget =
-        budgetController.text.replaceAll(',', '').replaceAll('₹', '').trim();
+    final responseProvider = Provider.of<ResponseProvider>(context, listen: false);
+    final budget = budgetController.text.replaceAll(',', '').replaceAll('₹', '').trim();
 
     setState(() {
       isLoading = true;
     });
 
     try {
-      final data =
-          await responseProvider.sendPcTypeRequest(selectedPcType, budget);
+      final data = await responseProvider.sendPcTypeRequest(selectedPcType, budget);
       setState(() {
         isLoading = false;
       });
