@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart';
-import 'package:printing/printing.dart';
 import 'package:intl/intl.dart';
+import 'package:printing/printing.dart';
 import 'database_helper.dart';
 import 'pdf_generator.dart';
 import 'components_table.dart';
@@ -87,39 +87,43 @@ class ResultPage extends StatelessWidget {
     });
 
     String? userName = await showDialog<String>(
-  context: context,
-  builder: (BuildContext context) {
-    return AlertDialog(
-      backgroundColor: Colors.grey[850], // Change background color to grey
-      title: const Text('Enter file name', style: TextStyle(color: Colors.white)),
-      content: TextField(
-        controller: nameController,
-        decoration: const InputDecoration(
-          hintText: 'Name',
-          hintStyle: TextStyle(color: Colors.white70),
-        ),
-        style: const TextStyle(color: Colors.white), // Change text color to white
-        onSubmitted: (value) {
-          Navigator.of(context).pop(value); // Save on Enter
-        },
-      ),
-      actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.of(context).pop(nameController.text);
-          },
-          child: const Text('Save'),
-          style: TextButton.styleFrom(
-            backgroundColor: const Color.fromARGB(255, 0, 46, 173), // Change to blue
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
-            textStyle: const TextStyle(fontSize: 18),
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.grey[850], // Change background color to grey
+          title: const Text('Enter file name',
+              style: TextStyle(color: Colors.white)),
+          content: TextField(
+            controller: nameController,
+            decoration: const InputDecoration(
+              hintText: 'Name',
+              hintStyle: TextStyle(color: Colors.white70),
+            ),
+            style: const TextStyle(
+                color: Colors.white), // Change text color to white
+            onSubmitted: (value) {
+              Navigator.of(context).pop(value); // Save on Enter
+            },
           ),
-        ),
-      ],
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(nameController.text);
+              },
+              child: const Text('Save'),
+              style: TextButton.styleFrom(
+                backgroundColor:
+                    const Color.fromARGB(255, 0, 46, 173), // Change to blue
+                foregroundColor: Colors.white,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+                textStyle: const TextStyle(fontSize: 18),
+              ),
+            ),
+          ],
+        );
+      },
     );
-  },
-);
 
     if (userName != null && userName.isNotEmpty) {
       await DatabaseHelper().saveResult(date, userName, data);
@@ -206,8 +210,8 @@ class ResultPage extends StatelessWidget {
                           final description = details['description'] ??
                               'No description available';
                           final specsString = details['specs'] ?? '{}';
-                          final specs = jsonDecode(specsString)
-                              as Map<String, dynamic>;
+                          final specs =
+                              jsonDecode(specsString) as Map<String, dynamic>;
 
                           return Container(
                             decoration: BoxDecoration(
@@ -215,7 +219,8 @@ class ResultPage extends StatelessWidget {
                               borderRadius: BorderRadius.circular(8.0),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Color.fromARGB(255, 0, 82, 150).withOpacity(0.6),
+                                  color: Color.fromARGB(255, 0, 82, 150)
+                                      .withOpacity(0.6),
                                   spreadRadius: 3,
                                   blurRadius: 5,
                                 ),
@@ -237,8 +242,7 @@ class ResultPage extends StatelessWidget {
                                   ),
                                   Text(
                                     'Price: ',
-                                    style:
-                                        const TextStyle(color: Colors.white),
+                                    style: const TextStyle(color: Colors.white),
                                   ),
                                   Text(
                                     price,
@@ -249,8 +253,7 @@ class ResultPage extends StatelessWidget {
                                   ),
                                   Text(
                                     'Description: $description',
-                                    style:
-                                        const TextStyle(color: Colors.white),
+                                    style: const TextStyle(color: Colors.white),
                                   ),
                                   const SizedBox(height: 10),
                                   const Text(
@@ -269,15 +272,15 @@ class ResultPage extends StatelessWidget {
                                         DataColumn(
                                           label: Text(
                                             'Specification',
-                                            style: TextStyle(
-                                                color: Colors.white),
+                                            style:
+                                                TextStyle(color: Colors.white),
                                           ),
                                         ),
                                         DataColumn(
                                           label: Text(
                                             'Value',
-                                            style: TextStyle(
-                                                color: Colors.white),
+                                            style:
+                                                TextStyle(color: Colors.white),
                                           ),
                                         ),
                                       ],
@@ -319,8 +322,8 @@ class ResultPage extends StatelessWidget {
                           final description = details['description'] ??
                               'No description available';
                           final specsString = details['specs'] ?? '{}';
-                          final specs = jsonDecode(specsString)
-                              as Map<String, dynamic>;
+                          final specs =
+                              jsonDecode(specsString) as Map<String, dynamic>;
 
                           return Container(
                             decoration: BoxDecoration(
@@ -350,8 +353,7 @@ class ResultPage extends StatelessWidget {
                                   ),
                                   Text(
                                     'Price: ',
-                                    style:
-                                        const TextStyle(color: Colors.white),
+                                    style: const TextStyle(color: Colors.white),
                                   ),
                                   Text(
                                     price,
@@ -362,8 +364,7 @@ class ResultPage extends StatelessWidget {
                                   ),
                                   Text(
                                     'Description: $description',
-                                    style:
-                                        const TextStyle(color: Colors.white),
+                                    style: const TextStyle(color: Colors.white),
                                   ),
                                   const SizedBox(height: 10),
                                   const Text(
@@ -382,15 +383,15 @@ class ResultPage extends StatelessWidget {
                                         DataColumn(
                                           label: Text(
                                             'Specification',
-                                            style: TextStyle(
-                                                color: Colors.white),
+                                            style:
+                                                TextStyle(color: Colors.white),
                                           ),
                                         ),
                                         DataColumn(
                                           label: Text(
                                             'Value',
-                                            style: TextStyle(
-                                                color: Colors.white),
+                                            style:
+                                                TextStyle(color: Colors.white),
                                           ),
                                         ),
                                       ],
@@ -450,7 +451,9 @@ class ResultPage extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const DashboardPage(name: '',),
+                      builder: (context) => const DashboardPage(
+                        name: '',
+                      ),
                     ),
                   );
                 },
