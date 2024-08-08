@@ -9,6 +9,7 @@ import 'pdf_generator.dart';
 import 'components_table.dart';
 import 'installation_instructions.dart';
 import 'balance_sheet.dart';
+import '../dashboard_page.dart'; // Import your DashboardPage
 
 class ResultPage extends StatelessWidget {
   final Map<String, Map<String, String?>>? selectedComponents;
@@ -265,6 +266,23 @@ class ResultPage extends StatelessWidget {
                           await saveResult(context);
                         },
                         child: const Text('Save'),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          // Navigate to the dashboard page
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const DashboardPage(name: '',),
+                            ),
+                          );
+                        },
+                        child: const Text('Home'),
                       ),
                     ),
                   ),
