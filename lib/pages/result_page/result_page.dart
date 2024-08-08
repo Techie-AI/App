@@ -176,103 +176,103 @@ class ResultPage extends StatelessWidget {
                     const SizedBox(height: 10),
                     if (screenWidth > 600)
                       GridView.builder(
-                        physics: const NeverScrollableScrollPhysics(), // Prevent scrolling
-                        shrinkWrap: true, // Allow the GridView to take only the space it needs
-                        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                          maxCrossAxisExtent: screenWidth / 2, // Max width for each item
-                          childAspectRatio: 0.8, // Aspect ratio of each item
-                          crossAxisSpacing: 16.0, // Space between columns
-                          mainAxisSpacing: 16.0, // Space between rows
-                        ),
-                        itemCount: components.length,
-                        itemBuilder: (context, index) {
-                          final componentType = components.keys.elementAt(index);
-                          final details = components[componentType]!;
-                          final name = details['name'] ?? 'N/A';
-                          final price = details['price'] ?? 'N/A';
-                          final description = details['description'] ?? 'No description available';
-                          final specsString = details['specs'] ?? '{}';
-                          final specs = jsonDecode(specsString) as Map<String, dynamic>;
+  physics: const NeverScrollableScrollPhysics(), // Prevent scrolling
+  shrinkWrap: true, // Allow the GridView to take only the space it needs
+  gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+    maxCrossAxisExtent: screenWidth / 2, // Max width for each item
+    crossAxisSpacing: 16.0, // Space between columns
+    mainAxisSpacing: 16.0, // Space between rows
+  ),
+  itemCount: components.length,
+  itemBuilder: (context, index) {
+    final componentType = components.keys.elementAt(index);
+    final details = components[componentType]!;
+    final name = details['name'] ?? 'N/A';
+    final price = details['price'] ?? 'N/A';
+    final description = details['description'] ?? 'No description available';
+    final specsString = details['specs'] ?? '{}';
+    final specs = jsonDecode(specsString) as Map<String, dynamic>;
 
-                          return Card(
-                            color: Colors.grey[850],
-                            child: Padding(
-                              padding: const EdgeInsets.all(16.0),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '$componentType: $name',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  Text(
-                                    'Price: ',
-                                    style: const TextStyle(color: Colors.white),
-                                  ),
-                                  Text(
-                                    price,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold, // Make price bold
-                                    ),
-                                  ),
-                                  Text(
-                                    'Description: $description',
-                                    style: const TextStyle(color: Colors.white),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  const Text(
-                                    'Specifications:',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 10),
-                                  SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal, // Allow horizontal scrolling
-                                    child: DataTable(
-                                      columns: [
-                                        DataColumn(
-                                          label: Text(
-                                            'Specification',
-                                            style: TextStyle(color: Colors.white),
-                                          ),
-                                        ),
-                                        DataColumn(
-                                          label: Text(
-                                            'Value',
-                                            style: TextStyle(color: Colors.white),
-                                          ),
-                                        ),
-                                      ],
-                                      rows: specs.entries.map((entry) {
-                                        return DataRow(
-                                          cells: [
-                                            DataCell(Text(
-                                              entry.key,
-                                              style: const TextStyle(color: Colors.white),
-                                            )),
-                                            DataCell(Text(
-                                              entry.value.toString(),
-                                              style: const TextStyle(color: Colors.white),
-                                            )),
-                                          ],
-                                        );
-                                      }).toList(),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      )
+    return Card(
+      color: Colors.grey[850],
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min, // Minimize the height based on content
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              '$componentType: $name',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            Text(
+              'Price: ',
+              style: const TextStyle(color: Colors.white),
+            ),
+            Text(
+              price,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold, // Make price bold
+              ),
+            ),
+            Text(
+              'Description: $description',
+              style: const TextStyle(color: Colors.white),
+            ),
+            const SizedBox(height: 10),
+            const Text(
+              'Specifications:',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 10),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal, // Allow horizontal scrolling
+              child: DataTable(
+                columns: [
+                  DataColumn(
+                    label: Text(
+                      'Specification',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'Value',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                ],
+                rows: specs.entries.map((entry) {
+                  return DataRow(
+                    cells: [
+                      DataCell(Text(
+                        entry.key,
+                        style: const TextStyle(color: Colors.white),
+                      )),
+                      DataCell(Text(
+                        entry.value.toString(),
+                        style: const TextStyle(color: Colors.white),
+                      )),
+                    ],
+                  );
+                }).toList(),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  },
+)
                     else
                       ListView.builder(
                         physics: const NeverScrollableScrollPhysics(), // Prevent scrolling
