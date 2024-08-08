@@ -1,13 +1,40 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart';
+import 'package:path/path.dart'; // Import path package
+import 'package:techie_ai/pages/result_page/result_page.dart';
 import '../widgets/background_wrapper.dart';
 import '../pages/option_screen/options_screen.dart'; // Import the OptionsScreen
 import '../pages/home_page.dart'; // Import the HomePage
 
-class DashboardPage extends StatelessWidget {
+class DashboardPage extends StatefulWidget {
   final String name;
 
   const DashboardPage({required this.name, super.key});
+
+  @override
+  _DashboardPageState createState() => _DashboardPageState();
+}
+
+class _DashboardPageState extends State<DashboardPage> {
+  late Future<List<Map<String, dynamic>>> _resultsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _resultsFuture = _fetchResults();
+  }
+
+  Future<List<Map<String, dynamic>>> _fetchResults() async {
+    final databasePath = await getDatabasesPath();
+    final path = join(databasePath, 'result_data.db');
+
+    final database = await openDatabase(path, version: 1);
+
+    // Assuming you have a table called 'results' with columns 'id', 'date', 'name', and 'data'
+    final List<Map<String, dynamic>> results = await database.query('results');
+    return results;
+  }
 
   Future<void> _logout(BuildContext context) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -39,7 +66,8 @@ class DashboardPage extends StatelessWidget {
                       decoration: const BoxDecoration(
                         shape: BoxShape.circle,
                         image: DecorationImage(
-                          image: AssetImage('assets/photo.jpg'), // Replace with the actual image path
+                          image: AssetImage(
+                              'assets/photo.jpg'), // Replace with the actual image path
                           fit: BoxFit.cover,
                         ),
                       ),
@@ -56,8 +84,9 @@ class DashboardPage extends StatelessWidget {
                             color: Colors.white,
                           ),
                         ),
-                        AnimatedText(name: name),
-                        const SizedBox(height: 10.0), // Add spacing between the texts
+                        AnimatedText(name: widget.name),
+                        const SizedBox(
+                            height: 10.0), // Add spacing between the texts
                         TypingText(
                           text: 'How can I help you',
                           highlightText: 'today',
@@ -89,7 +118,8 @@ class DashboardPage extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => const OptionsScreen(), // Navigate to OptionsScreen
+                        builder: (context) =>
+                            const OptionsScreen(), // Navigate to OptionsScreen
                       ),
                     );
                   },
@@ -110,24 +140,74 @@ class DashboardPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 60.0),
-            // Previous Results placeholder
-            AnimatedGlowBox(
-              child: Container(
-                width: double.infinity,
-                height: 500.0,
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 48, 48, 48),
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                child: const Center(
-                  child: Text(
-                    'Previous Results',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
+            // Previous Results section
+            Expanded(
+              child: FutureBuilder<List<Map<String, dynamic>>>(
+                future: _resultsFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Center(child: Text('Error: ${snapshot.error}'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        'No previous results found',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    );
+                  } else {
+                    final results = snapshot.data!;
+                    return ListView.builder(
+                      itemCount: results.length,
+                      itemBuilder: (context, index) {
+                        final result = results[index];
+                        final date = result['date'];
+                        final name = result['name'];
+                        final String? data = result['data'];
+
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    ResultPage.withPreviousData(
+                                  previousResultData: data,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(vertical: 8.0),
+                            padding: const EdgeInsets.all(16.0),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[900],
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Date: $date',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  'Name: $name',
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  }
+                },
               ),
             ),
           ],
@@ -258,63 +338,20 @@ class _TypingTextState extends State<TypingText>
               widget.highlightText,
               style: const TextStyle(
                 fontSize: 24,
-                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                color: Colors.white, // Set color to white here
               ),
+            ),
+          ),
+          Text(
+            textParts[1],
+            style: const TextStyle(
+              fontSize: 24,
+              color: Colors.white,
             ),
           ),
         ],
       ],
-    );
-  }
-}
-
-class AnimatedGlowBox extends StatefulWidget {
-  final Widget child;
-
-  const AnimatedGlowBox({required this.child, Key? key}) : super(key: key);
-
-  @override
-  _AnimatedGlowBoxState createState() => _AnimatedGlowBoxState();
-}
-
-class _AnimatedGlowBoxState extends State<AnimatedGlowBox>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(seconds: 2),
-      vsync: this,
-    )..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12.0),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.blue.withOpacity(0.5 + 0.5 * _controller.value),
-                spreadRadius: 8,
-                blurRadius: 16,
-              ),
-            ],
-          ),
-          child: widget.child,
-        );
-      },
     );
   }
 }
