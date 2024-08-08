@@ -1,3 +1,5 @@
+// ignore_for_file: dead_code
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'build_option_card.dart';
@@ -59,23 +61,24 @@ class _ComponentOptionState extends State<ComponentOption> {
     }
   }
 
-  void _showConfirmationDialog(String componentType, String name,
-      String priceString, String? link, double price) async {
-    bool isLoading = true;
-    String description = '';
-    Map<String, String> specs = {};
+ void _showConfirmationDialog(String componentType, String name,
+    String priceString, String? link, double price) async {
+  bool isLoading = true;
+  String description = '';
+  Map<String, String> specs = {};
 
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.black, // Set dialog background to black
-          title: const Text('Confirm Selection',
-              style: TextStyle(color: Colors.white)), // Title color
-          content: isLoading
-              ? const Center(child: CircularProgressIndicator())
-              : Column(
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: Colors.black, // Set dialog background to black
+        title: const Text('Confirm Selection',
+            style: TextStyle(color: Colors.white)), // Title color
+        content: isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView( // Make the content scrollable
+                child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -96,78 +99,79 @@ class _ComponentOptionState extends State<ComponentOption> {
                     const SizedBox(height: 10),
                     const Text('Specifications:',
                         style: TextStyle(color: Colors.white)),
-                    ...specs.entries
-                        .map((entry) => Text('${entry.key}: ${entry.value}',
-                            style: const TextStyle(color: Colors.white)))
-                        .toList(),
+                    ...specs.entries.map((entry) => Text(
+                        '${entry.key}: ${entry.value}',
+                        style: const TextStyle(color: Colors.white))),
                   ],
                 ),
-          actions: [
-            TextButton(
-              onPressed: isLoading
-                  ? null
-                  : () {
-                      Navigator.of(context).pop();
-                    },
-              child: const Text('Back',
-                  style:
-                      TextStyle(color: Colors.blueAccent)), // Button text color
-            ),
-            TextButton(
-              onPressed: isLoading
-                  ? null
-                  : () {
-                      setState(() {
-                        selectedComponents[componentType] = {
-                          'name': name,
-                          'price': priceString,
-                          'link': link,
-                          'description': description,
-                          'specs':
-                              jsonEncode(specs), // Store specs as JSON string
-                        };
-                        updateBudget(price, true);
-                      });
-                      Navigator.of(context).pop();
-                    },
-              child: const Text('Confirm',
-                  style:
-                      TextStyle(color: Colors.blueAccent)), // Button text color
-            ),
-          ],
-        );
-      },
-    );
+              ),
+        actions: [
+          TextButton(
+            onPressed: isLoading
+                ? null
+                : () {
+                    Navigator.of(context).pop();
+                  },
+            child: const Text('Back',
+                style:
+                    TextStyle(color: Colors.blueAccent)), // Button text color
+          ),
+          TextButton(
+            onPressed: isLoading
+                ? null
+                : () {
+                    setState(() {
+                      selectedComponents[componentType] = {
+                        'name': name,
+                        'price': priceString,
+                        'link': link,
+                        'description': description,
+                        'specs':
+                            jsonEncode(specs), // Store specs as JSON string
+                      };
+                      updateBudget(price, true);
+                    });
+                    Navigator.of(context).pop();
+                  },
+            child: const Text('Confirm',
+                style:
+                    TextStyle(color: Colors.blueAccent)), // Button text color
+          ),
+        ],
+      );
+    },
+  );
 
-    final descriptionProvider =
-        Provider.of<DescriptionProvider>(context, listen: false);
-    final response =
-        await descriptionProvider.getComponentDescription(name, priceString);
+  final descriptionProvider =
+      Provider.of<DescriptionProvider>(context, listen: false);
+  final response =
+      await descriptionProvider.getComponentDescription(name, priceString);
 
-    try {
-      final data = jsonDecode(response) as Map<String, dynamic>;
-      description = data['description'] ?? '';
-      final specsData = data['specs'];
+  try {
+    final data = jsonDecode(response) as Map<String, dynamic>;
+    description = data['description'] ?? '';
+    final specsData = data['specs'];
 
-      if (specsData is Map<String, dynamic>) {
-        specs = Map<String, String>.from(specsData);
-      } else {
-        throw Exception('Invalid specs format');
-      }
-    } catch (e) {
-      print("Error parsing response: $e");
-      description = 'An error occurred while fetching the description.';
+    if (specsData is Map<String, dynamic>) {
+      specs = Map<String, String>.from(specsData);
+    } else {
+      throw Exception('Invalid specs format');
     }
+  } catch (e) {
+    print("Error parsing response: $e");
+    description = 'An error occurred while fetching the description.';
+  }
 
-    Navigator.of(context).pop();
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: Colors.black, // Set dialog background to black
-          title: const Text('Confirm Selection',
-              style: TextStyle(color: Colors.white)), // Title color
-          content: Column(
+  Navigator.of(context).pop();
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        backgroundColor: Colors.black, // Set dialog background to black
+        title: const Text('Confirm Selection',
+            style: TextStyle(color: Colors.white)), // Title color
+        content: SingleChildScrollView( // Make the content scrollable
+          child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -192,38 +196,39 @@ class _ComponentOptionState extends State<ComponentOption> {
                   .toList(),
             ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('Back',
-                  style:
-                      TextStyle(color: Colors.blueAccent)), // Button text color
-            ),
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  selectedComponents[componentType] = {
-                    'name': name,
-                    'price': priceString,
-                    'link': link,
-                    'description': description,
-                    'specs': jsonEncode(specs), // Store specs as JSON string
-                  };
-                  updateBudget(price, true);
-                });
-                Navigator.of(context).pop();
-              },
-              child: const Text('Confirm',
-                  style:
-                      TextStyle(color: Colors.blueAccent)), // Button text color
-            ),
-          ],
-        );
-      },
-    );
-  }
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            child: const Text('Back',
+                style:
+                    TextStyle(color: Colors.blueAccent)), // Button text color
+          ),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                selectedComponents[componentType] = {
+                  'name': name,
+                  'price': priceString,
+                  'link': link,
+                  'description': description,
+                  'specs': jsonEncode(specs), // Store specs as JSON string
+                };
+                updateBudget(price, true);
+              });
+              Navigator.of(context).pop();
+            },
+            child: const Text('Confirm',
+                style:
+                    TextStyle(color: Colors.blueAccent)), // Button text color
+          ),
+        ],
+      );
+    },
+  );
+}
 
   void navigateToResultPage() {
     Navigator.push(

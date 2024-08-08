@@ -20,7 +20,7 @@ class PdfGenerator {
         border: pw.TableBorder.all(),
         children: [
           pw.TableRow(
-            decoration: pw.BoxDecoration(
+            decoration: const pw.BoxDecoration(
               color: PdfColors.grey300,
             ),
             children: [
@@ -55,7 +55,7 @@ class PdfGenerator {
                 ),
                 pw.Padding(
                   padding: const pw.EdgeInsets.all(8.0),
-                  child: pw.Text('${details['price'] ?? '0'}'),
+                  child: pw.Text(details['price'] ?? '0'),
                 ),
               ],
             );
