@@ -11,33 +11,49 @@ import 'installation_instructions.dart';
 import 'balance_sheet.dart';
 
 class ResultPage extends StatelessWidget {
-  final Map<String, Map<String, String?>> selectedComponents;
-  final double initialBudget;
+  final Map<String, Map<String, String?>>? selectedComponents;
+  final double? initialBudget;
+  final String? previousResultData;
 
+  // Original constructor
   const ResultPage({
     super.key,
     required this.selectedComponents,
     required this.initialBudget,
-  });
+  }) : previousResultData = null;
+
+  // Named constructor for previous result data
+  const ResultPage.withPreviousData({
+    super.key,
+    required this.previousResultData,
+  })  : selectedComponents = null,
+        initialBudget = null;
 
   double calculateTotalCost() {
     double total = 0.0;
-    selectedComponents.forEach((componentType, details) {
-      if (details.containsKey('price')) {
-        String priceString = details['price'] ?? '0';
-        total +=
-            double.tryParse(priceString.replaceAll(RegExp(r'[^0-9.]'), '')) ??
-                0.0;
-      }
-    });
+    final components = previousResultData != null
+        ? jsonDecode(previousResultData!)['selectedComponents']
+        : selectedComponents;
+
+    if (components is Map<String, dynamic>) {
+      components.forEach((componentType, details) {
+        if (details.containsKey('price')) {
+          String priceString = details['price'] ?? '0';
+          total +=
+              double.tryParse(priceString.replaceAll(RegExp(r'[^0-9.]'), '')) ??
+                  0.0;
+        }
+      });
+    }
     return total;
   }
 
   Future<Uint8List> generatePdf() async {
     double totalCost = calculateTotalCost();
     return PdfGenerator.generatePdf(
-      selectedComponents,
-      initialBudget,
+      selectedComponents ??
+          jsonDecode(previousResultData!)['selectedComponents'],
+      initialBudget ?? jsonDecode(previousResultData!)['initialBudget'],
       totalCost,
     );
   }
@@ -45,27 +61,34 @@ class ResultPage extends StatelessWidget {
   Future<void> saveResult() async {
     final date = DateFormat('yyyy-MM-dd').format(DateTime.now());
     final data = jsonEncode({
-      'selectedComponents': selectedComponents,
-      'initialBudget': initialBudget,
+      'selectedComponents': selectedComponents ??
+          jsonDecode(previousResultData!)['selectedComponents'],
+      'initialBudget':
+          initialBudget ?? jsonDecode(previousResultData!)['initialBudget'],
     });
     await DatabaseHelper().saveResult(date, data);
   }
 
   @override
   Widget build(BuildContext context) {
+    final components = previousResultData != null
+        ? jsonDecode(previousResultData!)['selectedComponents']
+        : selectedComponents;
+    final budget =
+        initialBudget ?? jsonDecode(previousResultData!)['initialBudget'];
     double totalCost = calculateTotalCost();
-    double remainingBudget = initialBudget - totalCost;
+    double remainingBudget = budget - totalCost;
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Theme(
       data: ThemeData.dark().copyWith(
-        colorScheme: ColorScheme.dark(
+        colorScheme: const ColorScheme.dark(
           primary: Colors.deepPurple,
           secondary: Colors.deepPurpleAccent,
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: Color.fromARGB(255, 0, 46, 173),
+            backgroundColor: const Color.fromARGB(255, 0, 46, 173),
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
             textStyle: const TextStyle(fontSize: 18),
@@ -75,20 +98,20 @@ class ResultPage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Selected Components'),
-          backgroundColor: Color.fromARGB(255, 0, 27, 68),
+          backgroundColor: const Color.fromARGB(255, 0, 27, 68),
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
           child: ListView(
             children: [
               ComponentsTable(
-                selectedComponents: selectedComponents,
-                screenWidth: screenWidth, // Pass screenWidth here
+                selectedComponents: components,
+                screenWidth: screenWidth,
               ),
               const SizedBox(height: 20),
               const InstallationInstructions(),
               const SizedBox(height: 20),
-              if (selectedComponents.isNotEmpty)
+              if (components.isNotEmpty)
                 Container(
                   padding: const EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
@@ -107,9 +130,9 @@ class ResultPage extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 10),
-                      ...selectedComponents.entries.map((entry) {
+                      ...components.entries.map((entry) {
                         final componentType = entry.key;
-                        final details = entry.value;
+                        final details = entry.value as Map<String, dynamic>;
                         final name = details['name'] ?? 'N/A';
                         final price = details['price'] ?? 'N/A';
                         final description = details['description'] ??
@@ -165,7 +188,7 @@ class ResultPage extends StatelessWidget {
               const SizedBox(height: 20),
               BalanceSheet(
                 totalCost: totalCost,
-                initialBudget: initialBudget,
+                initialBudget: budget,
                 remainingBudget: remainingBudget,
               ),
               const SizedBox(height: 20),
