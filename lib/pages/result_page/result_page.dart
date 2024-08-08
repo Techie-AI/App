@@ -136,7 +136,7 @@ class ResultPage extends StatelessWidget {
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color.fromARGB(255, 0, 46, 173),
+            backgroundColor: Color.fromARGB(255, 0, 46, 173),
             foregroundColor: Colors.white,
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
             textStyle: const TextStyle(fontSize: 18),
@@ -176,122 +176,42 @@ class ResultPage extends StatelessWidget {
                     const SizedBox(height: 10),
                     if (screenWidth > 600)
                       GridView.builder(
-  physics: const NeverScrollableScrollPhysics(), // Prevent scrolling
-  shrinkWrap: true, // Allow the GridView to take only the space it needs
-  gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-    maxCrossAxisExtent: screenWidth / 2, // Max width for each item
-    crossAxisSpacing: 16.0, // Space between columns
-    mainAxisSpacing: 16.0, // Space between rows
-  ),
-  itemCount: components.length,
-  itemBuilder: (context, index) {
-    final componentType = components.keys.elementAt(index);
-    final details = components[componentType]!;
-    final name = details['name'] ?? 'N/A';
-    final price = details['price'] ?? 'N/A';
-    final description = details['description'] ?? 'No description available';
-    final specsString = details['specs'] ?? '{}';
-    final specs = jsonDecode(specsString) as Map<String, dynamic>;
-
-    return Card(
-      color: Colors.grey[850],
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min, // Minimize the height based on content
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '$componentType: $name',
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-            Text(
-              'Price: ',
-              style: const TextStyle(color: Colors.white),
-            ),
-            Text(
-              price,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold, // Make price bold
-              ),
-            ),
-            Text(
-              'Description: $description',
-              style: const TextStyle(color: Colors.white),
-            ),
-            const SizedBox(height: 10),
-            const Text(
-              'Specifications:',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-            const SizedBox(height: 10),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal, // Allow horizontal scrolling
-              child: DataTable(
-                columns: [
-                  DataColumn(
-                    label: Text(
-                      'Specification',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                  DataColumn(
-                    label: Text(
-                      'Value',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
-                rows: specs.entries.map((entry) {
-                  return DataRow(
-                    cells: [
-                      DataCell(Text(
-                        entry.key,
-                        style: const TextStyle(color: Colors.white),
-                      )),
-                      DataCell(Text(
-                        entry.value.toString(),
-                        style: const TextStyle(color: Colors.white),
-                      )),
-                    ],
-                  );
-                }).toList(),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  },
-)
-                    else
-                      ListView.builder(
-                        physics: const NeverScrollableScrollPhysics(), // Prevent scrolling
-                        shrinkWrap: true, // Allow the ListView to take only the space it needs
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                          maxCrossAxisExtent: screenWidth / 2,
+                          crossAxisSpacing: 16.0,
+                          mainAxisSpacing: 16.0,
+                        ),
                         itemCount: components.length,
                         itemBuilder: (context, index) {
-                          final componentType = components.keys.elementAt(index);
+                          final componentType =
+                              components.keys.elementAt(index);
                           final details = components[componentType]!;
                           final name = details['name'] ?? 'N/A';
                           final price = details['price'] ?? 'N/A';
-                          final description = details['description'] ?? 'No description available';
+                          final description = details['description'] ??
+                              'No description available';
                           final specsString = details['specs'] ?? '{}';
-                          final specs = jsonDecode(specsString) as Map<String, dynamic>;
+                          final specs = jsonDecode(specsString)
+                              as Map<String, dynamic>;
 
-                          return Card(
-                            color: Colors.grey[850],
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey[850],
+                              borderRadius: BorderRadius.circular(8.0),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color.fromARGB(255, 0, 82, 150).withOpacity(0.6),
+                                  spreadRadius: 3,
+                                  blurRadius: 5,
+                                ),
+                              ],
+                            ),
                             child: Padding(
                               padding: const EdgeInsets.all(16.0),
                               child: Column(
+                                mainAxisSize: MainAxisSize.min,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
@@ -304,18 +224,20 @@ class ResultPage extends StatelessWidget {
                                   ),
                                   Text(
                                     'Price: ',
-                                    style: const TextStyle(color: Colors.white),
+                                    style:
+                                        const TextStyle(color: Colors.white),
                                   ),
                                   Text(
                                     price,
                                     style: const TextStyle(
                                       color: Colors.white,
-                                      fontWeight: FontWeight.bold, // Make price bold
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                   Text(
                                     'Description: $description',
-                                    style: const TextStyle(color: Colors.white),
+                                    style:
+                                        const TextStyle(color: Colors.white),
                                   ),
                                   const SizedBox(height: 10),
                                   const Text(
@@ -328,19 +250,21 @@ class ResultPage extends StatelessWidget {
                                   ),
                                   const SizedBox(height: 10),
                                   SingleChildScrollView(
-                                    scrollDirection: Axis.horizontal, // Allow horizontal scrolling
+                                    scrollDirection: Axis.horizontal,
                                     child: DataTable(
-                                      columns: [
+                                      columns: const [
                                         DataColumn(
                                           label: Text(
                                             'Specification',
-                                            style: TextStyle(color: Colors.white),
+                                            style: TextStyle(
+                                                color: Colors.white),
                                           ),
                                         ),
                                         DataColumn(
                                           label: Text(
                                             'Value',
-                                            style: TextStyle(color: Colors.white),
+                                            style: TextStyle(
+                                                color: Colors.white),
                                           ),
                                         ),
                                       ],
@@ -349,11 +273,126 @@ class ResultPage extends StatelessWidget {
                                           cells: [
                                             DataCell(Text(
                                               entry.key,
-                                              style: const TextStyle(color: Colors.white),
+                                              style: const TextStyle(
+                                                  color: Colors.white),
                                             )),
                                             DataCell(Text(
                                               entry.value.toString(),
-                                              style: const TextStyle(color: Colors.white),
+                                              style: const TextStyle(
+                                                  color: Colors.white),
+                                            )),
+                                          ],
+                                        );
+                                      }).toList(),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      )
+                    else
+                      ListView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: components.length,
+                        itemBuilder: (context, index) {
+                          final componentType =
+                              components.keys.elementAt(index);
+                          final details = components[componentType]!;
+                          final name = details['name'] ?? 'N/A';
+                          final price = details['price'] ?? 'N/A';
+                          final description = details['description'] ??
+                              'No description available';
+                          final specsString = details['specs'] ?? '{}';
+                          final specs = jsonDecode(specsString)
+                              as Map<String, dynamic>;
+
+                          return Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey[850],
+                              borderRadius: BorderRadius.circular(8.0),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color.fromARGB(255, 0, 82, 150),
+                                  spreadRadius: 5,
+                                  blurRadius: 4,
+                                ),
+                              ],
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    '$componentType: $name',
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Price: ',
+                                    style:
+                                        const TextStyle(color: Colors.white),
+                                  ),
+                                  Text(
+                                    price,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Description: $description',
+                                    style:
+                                        const TextStyle(color: Colors.white),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  const Text(
+                                    'Specifications:',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 10),
+                                  SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: DataTable(
+                                      columns: const [
+                                        DataColumn(
+                                          label: Text(
+                                            'Specification',
+                                            style: TextStyle(
+                                                color: Colors.white),
+                                          ),
+                                        ),
+                                        DataColumn(
+                                          label: Text(
+                                            'Value',
+                                            style: TextStyle(
+                                                color: Colors.white),
+                                          ),
+                                        ),
+                                      ],
+                                      rows: specs.entries.map((entry) {
+                                        return DataRow(
+                                          cells: [
+                                            DataCell(Text(
+                                              entry.key,
+                                              style: const TextStyle(
+                                                  color: Colors.white),
+                                            )),
+                                            DataCell(Text(
+                                              entry.value.toString(),
+                                              style: const TextStyle(
+                                                  color: Colors.white),
                                             )),
                                           ],
                                         );
@@ -366,60 +405,43 @@ class ResultPage extends StatelessWidget {
                           );
                         },
                       ),
+                    const SizedBox(height: 20),
                   ],
                 ),
-              const SizedBox(height: 20),
               BalanceSheet(
-                totalCost: totalCost,
                 initialBudget: budget,
+                totalCost: totalCost,
                 remainingBudget: remainingBudget,
               ),
               const SizedBox(height: 20),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          final pdfData = await generatePdf();
-                          await Printing.layoutPdf(
-                            onLayout: (PdfPageFormat format) async => pdfData,
-                          );
-                        },
-                        child: const Text('Print Document'),
-                      ),
-                    ),
+                  ElevatedButton(
+                    onPressed: () async {
+                      final pdfData = await generatePdf();
+                      await Printing.layoutPdf(
+                          onLayout: (PdfPageFormat format) async => pdfData);
+                    },
+                    child: const Text('Generate PDF'),
                   ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          saveResult(context);
-                        },
-                        child: const Text('Save Result'),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const DashboardPage(name: '',),
-                            ),
-                          );
-                        },
-                        child: const Text('Dashboard'),
-                      ),
-                    ),
+                  ElevatedButton(
+                    onPressed: () => saveResult(context),
+                    child: const Text('Save Result'),
                   ),
                 ],
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const DashboardPage(name: '',),
+                    ),
+                  );
+                },
+                child: const Text('Return to Dashboard'),
               ),
             ],
           ),
