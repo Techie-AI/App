@@ -1,3 +1,5 @@
+// ignore_for_file: dead_code
+
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'build_option_card.dart';
@@ -96,10 +98,9 @@ class _ComponentOptionState extends State<ComponentOption> {
                     const SizedBox(height: 10),
                     const Text('Specifications:',
                         style: TextStyle(color: Colors.white)),
-                    ...specs.entries
-                        .map((entry) => Text('${entry.key}: ${entry.value}',
-                            style: const TextStyle(color: Colors.white)))
-                        .toList(),
+                    ...specs.entries.map((entry) => Text(
+                        '${entry.key}: ${entry.value}',
+                        style: const TextStyle(color: Colors.white))),
                   ],
                 ),
           actions: [
