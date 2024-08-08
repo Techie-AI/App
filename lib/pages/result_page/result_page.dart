@@ -15,16 +15,13 @@ class ResultPage extends StatelessWidget {
   final double? initialBudget;
   final String? previousResultData;
 
-  // Original constructor
   const ResultPage({
     super.key,
     required this.selectedComponents,
     required this.initialBudget,
   }) : previousResultData = null;
 
-  // Named constructor for previous result data
   const ResultPage.withPreviousData({
-    super.key,
     required this.previousResultData,
   })  : selectedComponents = null,
         initialBudget = null;
@@ -32,10 +29,11 @@ class ResultPage extends StatelessWidget {
   double calculateTotalCost() {
     double total = 0.0;
     final components = previousResultData != null
-        ? jsonDecode(previousResultData!)['selectedComponents']
+        ? convertToTypedMap(
+            jsonDecode(previousResultData!)['selectedComponents'])
         : selectedComponents;
 
-    if (components is Map<String, dynamic>) {
+    if (components != null) {
       components.forEach((componentType, details) {
         if (details.containsKey('price')) {
           String priceString = details['price'] ?? '0';
@@ -48,31 +46,80 @@ class ResultPage extends StatelessWidget {
     return total;
   }
 
+  Map<String, Map<String, String?>> convertToTypedMap(
+      Map<String, dynamic> data) {
+    final Map<String, Map<String, String?>> typedMap = {};
+
+    data.forEach((key, value) {
+      if (value is Map<String, dynamic>) {
+        final Map<String, String?> innerMap = {};
+        value.forEach((innerKey, innerValue) {
+          innerMap[innerKey] = innerValue?.toString();
+        });
+        typedMap[key] = innerMap;
+      }
+    });
+
+    return typedMap;
+  }
+
   Future<Uint8List> generatePdf() async {
     double totalCost = calculateTotalCost();
     return PdfGenerator.generatePdf(
       selectedComponents ??
-          jsonDecode(previousResultData!)['selectedComponents'],
+          convertToTypedMap(
+              jsonDecode(previousResultData!)['selectedComponents']),
       initialBudget ?? jsonDecode(previousResultData!)['initialBudget'],
       totalCost,
     );
   }
 
-  Future<void> saveResult() async {
+  Future<void> saveResult(BuildContext context) async {
+    final TextEditingController nameController = TextEditingController();
     final date = DateFormat('yyyy-MM-dd').format(DateTime.now());
     final data = jsonEncode({
       'selectedComponents': selectedComponents ??
-          jsonDecode(previousResultData!)['selectedComponents'],
+          convertToTypedMap(
+              jsonDecode(previousResultData!)['selectedComponents']),
       'initialBudget':
           initialBudget ?? jsonDecode(previousResultData!)['initialBudget'],
     });
-    await DatabaseHelper().saveResult(date, data);
+
+    // Show a dialog to ask for the user's name
+    String? userName = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Enter your name'),
+          content: TextField(
+            controller: nameController,
+            decoration: const InputDecoration(hintText: 'Name'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(nameController.text);
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (userName != null && userName.isNotEmpty) {
+      await DatabaseHelper().saveResult(date, userName, data);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Result saved successfully!')),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final components = previousResultData != null
-        ? jsonDecode(previousResultData!)['selectedComponents']
+        ? convertToTypedMap(
+            jsonDecode(previousResultData!)['selectedComponents'])
         : selectedComponents;
     final budget =
         initialBudget ?? jsonDecode(previousResultData!)['initialBudget'];
@@ -105,13 +152,14 @@ class ResultPage extends StatelessWidget {
           child: ListView(
             children: [
               ComponentsTable(
-                selectedComponents: components,
+                selectedComponents:
+                    components as Map<String, Map<String, String?>>,
                 screenWidth: screenWidth,
               ),
               const SizedBox(height: 20),
               const InstallationInstructions(),
               const SizedBox(height: 20),
-              if (components.isNotEmpty)
+              if (components!.isNotEmpty)
                 Container(
                   padding: const EdgeInsets.all(16.0),
                   decoration: BoxDecoration(
@@ -132,7 +180,7 @@ class ResultPage extends StatelessWidget {
                       const SizedBox(height: 10),
                       ...components.entries.map((entry) {
                         final componentType = entry.key;
-                        final details = entry.value as Map<String, dynamic>;
+                        final details = entry.value;
                         final name = details['name'] ?? 'N/A';
                         final price = details['price'] ?? 'N/A';
                         final description = details['description'] ??
@@ -214,11 +262,7 @@ class ResultPage extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: ElevatedButton(
                         onPressed: () async {
-                          await saveResult();
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                                content: Text('Result saved successfully!')),
-                          );
+                          await saveResult(context);
                         },
                         child: const Text('Save'),
                       ),

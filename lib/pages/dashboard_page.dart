@@ -27,11 +27,11 @@ class _DashboardPageState extends State<DashboardPage> {
 
   Future<List<Map<String, dynamic>>> _fetchResults() async {
     final databasePath = await getDatabasesPath();
-    final path = join(databasePath, 'my_database.db');
+    final path = join(databasePath, 'result_data.db');
 
     final database = await openDatabase(path, version: 1);
 
-    // Assuming you have a table called 'results' with columns 'id' and 'data'
+    // Assuming you have a table called 'results' with columns 'id', 'date', 'name', and 'data'
     final List<Map<String, dynamic>> results = await database.query('results');
     return results;
   }
@@ -162,24 +162,47 @@ class _DashboardPageState extends State<DashboardPage> {
                       itemCount: results.length,
                       itemBuilder: (context, index) {
                         final result = results[index];
-                        final id = result['id'];
-                        final data = result['data'];
+                        final date = result['date'];
+                        final name = result['name'];
+                        final String? data = result['data'];
 
-                        return ListTile(
-                          title: Text('Result $id'),
-                          subtitle: Text(data ?? 'No data'),
+                        return GestureDetector(
                           onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) =>
                                     ResultPage.withPreviousData(
-                                  previousResultData:
-                                      data, // Pass the result data
+                                  previousResultData: data,
                                 ),
                               ),
                             );
                           },
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(vertical: 8.0),
+                            padding: const EdgeInsets.all(16.0),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[900],
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Date: $date',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  'Name: $name',
+                                  style: const TextStyle(color: Colors.white),
+                                ),
+                              ],
+                            ),
+                          ),
                         );
                       },
                     );
@@ -315,62 +338,20 @@ class _TypingTextState extends State<TypingText>
               widget.highlightText,
               style: const TextStyle(
                 fontSize: 24,
-                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                color: Colors.white, // Set color to white here
               ),
+            ),
+          ),
+          Text(
+            textParts[1],
+            style: const TextStyle(
+              fontSize: 24,
+              color: Colors.white,
             ),
           ),
         ],
       ],
-    );
-  }
-}
-
-class AnimatedGlowBox extends StatefulWidget {
-  final Widget child;
-
-  const AnimatedGlowBox({required this.child, Key? key}) : super(key: key);
-
-  @override
-  _AnimatedGlowBoxState createState() => _AnimatedGlowBoxState();
-}
-
-class _AnimatedGlowBoxState extends State<AnimatedGlowBox>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(seconds: 2),
-      vsync: this,
-    )..repeat(reverse: true);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return Container(
-          decoration: BoxDecoration(
-            boxShadow: [
-              BoxShadow(
-                color: Colors.blue.withOpacity(_controller.value),
-                blurRadius: 20.0,
-                spreadRadius: 5.0,
-              ),
-            ],
-          ),
-          child: widget.child,
-        );
-      },
     );
   }
 }
