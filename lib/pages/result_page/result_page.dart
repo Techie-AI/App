@@ -86,27 +86,40 @@ class ResultPage extends StatelessWidget {
           initialBudget ?? jsonDecode(previousResultData!)['initialBudget'],
     });
 
-    // Show a dialog to ask for the user's name
     String? userName = await showDialog<String>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Enter your name'),
-          content: TextField(
-            controller: nameController,
-            decoration: const InputDecoration(hintText: 'Name'),
+  context: context,
+  builder: (BuildContext context) {
+    return AlertDialog(
+      backgroundColor: Colors.grey[850], // Change background color to grey
+      title: const Text('Enter file name', style: TextStyle(color: Colors.white)),
+      content: TextField(
+        controller: nameController,
+        decoration: const InputDecoration(
+          hintText: 'Name',
+          hintStyle: TextStyle(color: Colors.white70),
+        ),
+        style: const TextStyle(color: Colors.white), // Change text color to white
+        onSubmitted: (value) {
+          Navigator.of(context).pop(value); // Save on Enter
+        },
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop(nameController.text);
+          },
+          child: const Text('Save'),
+          style: TextButton.styleFrom(
+            backgroundColor: const Color.fromARGB(255, 0, 46, 173), // Change to blue
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 20),
+            textStyle: const TextStyle(fontSize: 18),
           ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(nameController.text);
-              },
-              child: const Text('Save'),
-            ),
-          ],
-        );
-      },
+        ),
+      ],
     );
+  },
+);
 
     if (userName != null && userName.isNotEmpty) {
       await DatabaseHelper().saveResult(date, userName, data);
