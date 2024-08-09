@@ -52,8 +52,16 @@ class _ComponentOptionState extends State<ComponentOption> {
       );
 
       String? link = option['link'];
-      _showComponentSelectionDialog(
-          componentType, name, priceString, link, price);
+
+      // Directly update the selected component and budget
+      setState(() {
+        selectedComponents[componentType] = {
+          'name': name,
+          'price': priceString,
+          'link': link,
+        };
+        updateBudget(price, true);
+      });
     } else {
       var removed = selectedComponents.remove(componentType);
       if (removed != null) {
@@ -64,6 +72,7 @@ class _ComponentOptionState extends State<ComponentOption> {
     }
   }
 
+  // Re-add the `_showComponentSelectionDialog` method for the "More Info" button
   void _showComponentSelectionDialog(String componentType, String name,
       String priceString, String? link, double price) async {
     final descriptionProvider =
@@ -170,66 +179,99 @@ class _ComponentOptionState extends State<ComponentOption> {
       showImportant = !showImportant;
     });
   }
-
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-          title: const Text('Budget Results'),
-          backgroundColor: Color.fromARGB(255, 29, 30, 32),
-          foregroundColor: Color.fromARGB(255, 236, 242, 255)),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Expanded(
-                  child: Text(
-                    'Based on your budget, here are some recommendations:',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Center(
-              child: Text(
-                showImportant
-                    ? 'Important Components'
-                    : 'Non-Important Components',
-                style: const TextStyle(
-                  fontSize: 18,
+Widget build(BuildContext context) {
+  return Scaffold(
+    appBar: AppBar(
+      title: const Text('Budget Results'),
+      backgroundColor: const Color.fromARGB(255, 29, 30, 32),
+      foregroundColor: const Color.fromARGB(255, 236, 242, 255),
+    ),
+    body: Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          double availableHeight = constraints.maxHeight - 200; // Adjust based on other widgets
+          double cardHeight = (availableHeight / (showImportant ? 4 : 6)).clamp(100.0, 200.0); // Set a min and max height
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Based on your budget, here are some recommendations:',
+                style: TextStyle(
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
               ),
-            ),
-            const SizedBox(height: 10),
-            Expanded(
-              child: ComponentView(
-                componentData: componentData,
-                showImportant: showImportant,
-                selectedComponents: selectedComponents,
-                onComponentSelection: handleComponentSelection,
+              const SizedBox(height: 20),
+              Center(
+                child: Text(
+                  showImportant
+                      ? 'Important Components'
+                      : 'Non-Important Components',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-            ComponentOptionButtons(
-              showImportant: showImportant,
-              onToggle: toggleComponentView,
-              onNext: handleNext,
-            ),
-          ],
-        ),
+              const SizedBox(height: 10),
+              Expanded(
+                child: ComponentView(
+                  componentData: componentData,
+                  showImportant: showImportant,
+                  selectedComponents: selectedComponents,
+                  onComponentSelection: handleComponentSelection,
+                  onMoreInfo: (String componentType) {}, // Optional callback
+                  cardHeight: cardHeight, // Pass the calculated height
+                ),
+              ),
+              const SizedBox(height: 20),
+              Container(
+                height: 200, // Set a fixed height for the box
+                child: ListView.builder(
+                  itemCount: selectedComponents.length,
+                  itemBuilder: (context, index) {
+                    String componentType = selectedComponents.keys.elementAt(index);
+                    Map<String, String?> component =
+                        selectedComponents[componentType]!;
+                    return ListTile(
+                      title: Text(
+                        '${component['name']} - ₹${component['price']}',
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                      trailing: ElevatedButton(
+                        onPressed: () {
+                          _showComponentSelectionDialog(
+                            componentType,
+                            component['name']!,
+                            component['price']!,
+                            component['link'],
+                            double.tryParse(component['price']!) ?? 0.0,
+                          );
+                        },
+                        child: const Text('More Info'),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(height: 20),
+              ComponentOptionButtons(
+                showImportant: showImportant,
+                onToggle: toggleComponentView,
+                onNext: handleNext,
+              ),
+              const SizedBox(height: 20),
+            ],
+          );
+        },
       ),
-      backgroundColor: Colors.black,
-    );
-  }
+    ),
+    backgroundColor: Colors.black,
+  );
+}
 }

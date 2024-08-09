@@ -5,7 +5,7 @@ Widget buildOptionCard(
   String title,
   List<dynamic> options,
   Map<String, Map<String, String?>> selectedComponents,
-  ValueChanged<String?> onChanged,
+  ValueChanged<String?> onChanged, {required void Function() onMoreInfo}
 ) {
   return Card(
     elevation: 4,
@@ -17,6 +17,7 @@ Widget buildOptionCard(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min, // Set to min to fit content
         children: [
           Text(
             title,
@@ -45,8 +46,7 @@ Widget buildOptionCard(
                               option['name'];
 
                   return Container(
-                    width: (width / crossAxisCount) -
-                        16, // Width of each option box
+                    width: (width / crossAxisCount) - 16, // Width of each option box
                     padding: const EdgeInsets.all(8.0),
                     decoration: BoxDecoration(
                       color: isSelected

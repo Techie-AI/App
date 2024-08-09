@@ -14,7 +14,7 @@ class ComponentView extends StatelessWidget {
     required this.componentData,
     required this.showImportant,
     required this.selectedComponents,
-    required this.onComponentSelection,
+    required this.onComponentSelection, required void Function(String componentType) onMoreInfo, required double cardHeight,
   });
 
   @override
@@ -49,7 +49,7 @@ class ComponentView extends StatelessWidget {
                 key.toUpperCase(),
                 component['options'] ?? [],
                 selectedComponents,
-                (value) => onComponentSelection(key, value),
+                (value) => onComponentSelection(key, value), onMoreInfo: () {  },
               );
             }
             return Container(); // Return an empty container if no component is found
