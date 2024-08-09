@@ -1,5 +1,8 @@
-import 'package:sqflite/sqflite.dart';
+// lib/database_helper.dart
+import 'dart:io';
+
 import 'package:path/path.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class DatabaseHelper {
   static final DatabaseHelper _instance = DatabaseHelper._internal();
@@ -15,6 +18,12 @@ class DatabaseHelper {
   }
 
   Future<Database> _initDatabase() async {
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      // Initialize sqflite_ffi for desktop platforms
+      sqfliteFfiInit();
+      databaseFactory = databaseFactoryFfi;
+    }
+
     final dbPath = await getDatabasesPath();
     return openDatabase(
       join(dbPath, 'result_data.db'),

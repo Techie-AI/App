@@ -1,13 +1,16 @@
 // lib/database_initializer.dart
-import 'package:sqflite/sqflite.dart';
-import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'dart:io';
+
 import 'package:path/path.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 
 class DatabaseInitializer {
   static Future<void> initializeDatabase() async {
-    // Initialize sqflite_ffi
-    sqfliteFfiInit();
-    databaseFactory = databaseFactoryFfi;
+    if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      // Initialize sqflite_ffi for desktop platforms
+      sqfliteFfiInit();
+      databaseFactory = databaseFactoryFfi;
+    }
 
     final dbPath = await getDatabasesPath();
     final db = await openDatabase(
