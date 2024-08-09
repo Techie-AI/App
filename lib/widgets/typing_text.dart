@@ -4,11 +4,13 @@ class TypingText extends StatefulWidget {
   final String text;
   final String highlightText;
   final LinearGradient highlightColor;
+  final TextStyle textStyle; // Add this
 
   const TypingText({
     required this.text,
     required this.highlightText,
     required this.highlightColor,
+    required this.textStyle, // Add this
     Key? key,
   }) : super(key: key);
 
@@ -16,9 +18,9 @@ class TypingText extends StatefulWidget {
   _TypingTextState createState() => _TypingTextState();
 }
 
-class _TypingTextState extends State<TypingText>
-    with SingleTickerProviderStateMixin {
-  String displayText = '';
+class _TypingTextState extends State<TypingText> {
+  String displayedText = '';
+  int currentIndex = 0;
 
   @override
   void initState() {
@@ -26,55 +28,52 @@ class _TypingTextState extends State<TypingText>
     _typeText();
   }
 
-  Future<void> _typeText() async {
-    for (var char in widget.text.split('')) {
-      await Future.delayed(const Duration(milliseconds: 100));
-      setState(() {
-        displayText += char;
-      });
-    }
-
-    await Future.delayed(const Duration(milliseconds: 200));
-    setState(() {
-      displayText += ' ${widget.highlightText}';
+  void _typeText() {
+    Future.delayed(const Duration(milliseconds: 50), () {
+      if (currentIndex < widget.text.length) {
+        setState(() {
+          displayedText += widget.text[currentIndex];
+          currentIndex++;
+        });
+        _typeText();
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final List<String> textParts = displayText.split(widget.highlightText);
-    return Row(
-      children: [
-        Text(
-          textParts[0],
-          style: const TextStyle(
-            fontSize: 24,
-            color: Colors.white,
-          ),
+    final textSpans = <TextSpan>[];
+
+    if (displayedText.contains(widget.highlightText)) {
+      final startIndex = displayedText.indexOf(widget.highlightText);
+      final endIndex = startIndex + widget.highlightText.length;
+
+      textSpans.add(TextSpan(
+        text: displayedText.substring(0, startIndex),
+        style: widget.textStyle,
+      ));
+
+      textSpans.add(TextSpan(
+        text: displayedText.substring(startIndex, endIndex),
+        style: widget.textStyle.copyWith(
+          foreground: Paint()
+            ..shader = widget.highlightColor.createShader(
+              Rect.fromLTWH(
+                  0, 0, widget.highlightText.length.toDouble() * 10, 0),
+            ),
         ),
-        if (textParts.length > 1) ...[
-          ShaderMask(
-            shaderCallback: (bounds) {
-              return widget.highlightColor.createShader(bounds);
-            },
-            child: Text(
-              widget.highlightText,
-              style: const TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ),
-          Text(
-            textParts[1],
-            style: const TextStyle(
-              fontSize: 24,
-              color: Colors.white,
-            ),
-          ),
-        ],
-      ],
+      ));
+
+      textSpans.add(TextSpan(
+        text: displayedText.substring(endIndex),
+        style: widget.textStyle,
+      ));
+    } else {
+      textSpans.add(TextSpan(text: displayedText, style: widget.textStyle));
+    }
+
+    return RichText(
+      text: TextSpan(children: textSpans),
     );
   }
 }

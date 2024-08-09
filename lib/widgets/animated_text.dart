@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 
 class AnimatedText extends StatefulWidget {
   final String name;
+  final double fontSize; // Add this
 
-  const AnimatedText({required this.name, Key? key}) : super(key: key);
+  const AnimatedText({
+    required this.name,
+    required this.fontSize, // Add this
+    Key? key,
+  }) : super(key: key);
 
   @override
   _AnimatedTextState createState() => _AnimatedTextState();
@@ -46,8 +51,8 @@ class _AnimatedTextState extends State<AnimatedText>
           },
           child: Text(
             widget.name,
-            style: const TextStyle(
-              fontSize: 42,
+            style: TextStyle(
+              fontSize: widget.fontSize, // Use widget.fontSize
               fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
