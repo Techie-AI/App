@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../pages/dashboard_page.dart';
-import '../widgets/background_wrapper.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -68,7 +67,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Colors.black, // Solid black background
+        color: Colors.black, 
         child: Center(
           child: SingleChildScrollView(
             child: LayoutBuilder(
@@ -87,7 +86,8 @@ class _LoginPageState extends State<LoginPage> {
                     width: cardWidth,
                     padding: const EdgeInsets.all(16.0),
                     child: Card(
-                      color: const Color(0xFF303030), // Background color matching the theme
+                      color: const Color(
+                          0xFF303030), 
                       elevation: 10,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -104,7 +104,8 @@ class _LoginPageState extends State<LoginPage> {
                               Image.asset(
                                 'assets/login.png', // Update with your logo asset path
                                 height: 100,
-                                width: 100, // Adjust the width and height as needed
+                                width:
+                                    100, // Adjust the width and height as needed
                                 fit: BoxFit.contain,
                               ),
                               const SizedBox(height: 16.0),
@@ -124,11 +125,16 @@ class _LoginPageState extends State<LoginPage> {
                                 focusNode: _emailFocusNode,
                                 nextFocusNode: _nameFocusNode,
                                 onSubmitted: (_) {
-                                  _nameFocusNode.requestFocus(); // Move focus to the name field
+                                  _nameFocusNode
+                                      .requestFocus(); // Move focus to the name field
                                 },
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
                                     return 'Please enter your email';
+                                  }
+                                  if (!RegExp(r'^[a-zA-Z]{2,}')
+                                      .hasMatch(value)) {
+                                    return 'Email must start with at least two alphabets';
                                   }
                                   if (!value.endsWith('@gmail.com')) {
                                     return 'Please enter a Gmail address';
@@ -149,6 +155,9 @@ class _LoginPageState extends State<LoginPage> {
                                   if (value == null || value.isEmpty) {
                                     return 'Please enter your name';
                                   }
+                                  if (value.length < 2) {
+                                    return 'Name must be at least two characters';
+                                  }
                                   return null;
                                 },
                               ),
@@ -157,7 +166,8 @@ class _LoginPageState extends State<LoginPage> {
                                 onPressed: _isButtonEnabled ? _login : null,
                                 style: ElevatedButton.styleFrom(
                                   elevation: 5,
-                                  backgroundColor: Colors.blue, // Button background color matching the theme
+                                  backgroundColor: Colors
+                                      .blue, // Button background color matching the theme
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(30.0),
                                   ),
@@ -170,7 +180,8 @@ class _LoginPageState extends State<LoginPage> {
                                   'Login',
                                   style: TextStyle(
                                     fontSize: 18,
-                                    color: Colors.white, // Button text color matching the theme
+                                    color: Colors
+                                        .white, // Button text color matching the theme
                                   ),
                                 ),
                               ),
@@ -211,14 +222,18 @@ class _LoginPageState extends State<LoginPage> {
         labelStyle: const TextStyle(color: Colors.white), // Label text color
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30.0),
-          borderSide: const BorderSide(color: Colors.white), // Border color when enabled
+          borderSide: const BorderSide(
+              color: Colors.white), // Border color when enabled
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(30.0),
-          borderSide: const BorderSide(color: Colors.blue), // Border color when focused
+          borderSide:
+              const BorderSide(color: Colors.blue), // Border color when focused
         ),
-        prefixIcon: Icon(icon, color: Colors.white), // Icon inside the input field
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16.0), // Padding inside the text field
+        prefixIcon:
+            Icon(icon, color: Colors.white), // Icon inside the input field
+        contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16.0), // Padding inside the text field
       ),
       style: const TextStyle(color: Colors.white), // Text color
       validator: validator,
